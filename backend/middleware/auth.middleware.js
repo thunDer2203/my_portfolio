@@ -27,6 +27,10 @@ export const AssignRole= async(req,res,next)=>{
     if(user.active === 0){
         return res.status(403).json("Forbidden: User account is inactive");
     }
+    if(user.role!=="admin"){
+        return res.status(403).json({
+      message: "Forbidden: Admins only",});
+    }
     req.userRole = user.role;
     next();
 }
