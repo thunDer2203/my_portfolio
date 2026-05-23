@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import ProductCarousel from "../components/ProductCarousel";
 import AuthModal from "../components/AuthModal";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function HomePage() {
   const [products,   setProducts]   = useState([]);
@@ -19,12 +19,24 @@ export default function HomePage() {
   // Load products on mount
   // console.log("Component mounted, BASE =", BASE);
   useEffect(() => {
-    // console.log("Fetching products...");
+    console.log("Fetching products...");
+    fetch(`${BASE}/cart`, { credentials: "include" })
+      .then(r => { return r.json(); })
+      .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0);})
+      .catch(() => setCartCount(0))
+      .finally(() => setLoading(false));
     fetch(`${BASE}/products`, { credentials: "include" })
       .then(r => {console.log(r); return r.json(); })
       .then(d => {console.log(d); setProducts(Array.isArray(d) ? d : d.products ?? []);})
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
+    fetch(`${BASE}/auth/check`, {method: "POST", credentials: "include" })
+    .then(r => r.json())
+    .then(d => {
+      console.log("Auth check:", d);
+      if (d.user) setUser({ name: d.user });
+    })
+    .catch(() => {})
   }, []);
 
   function showToast(msg, type = "success") {
@@ -34,10 +46,11 @@ export default function HomePage() {
 
   function handleAuthSuccess(data) {
     // Backend may return user inside data.user or at top level
+    console.log(data);
     const u = data.user || data;
     setUser(u);
     setAuthModal(null);
-    showToast(`Welcome, ${u.username || u.email}!`);
+    showToast(`Welcome, ${u.name}!`);
   }
 
   async function handleLogout() {
@@ -133,11 +146,11 @@ export default function HomePage() {
                 Shop now
               </a>
               {!user ? (
-                <button onClick={() => setAuthModal("register")} className="px-6 py-3 rounded-full border border-earth-300 text-bark font-medium hover:bg-earth-50 transition">
+                <button onClick={() => setAuthModal("register")} className="px-6 py-3 rounded-full border border-earth-300 text-bark font-medium hover:bg-amber-800 cursor-pointer transition">
                   Create account
                 </button>
               ) : (
-                <Link href="/about" className="px-6 py-3 rounded-full border border-earth-300 text-bark font-medium hover:bg-earth-50 transition">
+                <Link href="/about" className="px-6 py-3 rounded-full border border-earth-300 text-bark font-medium hover:bg-amber-800 cursor-pointer transition">
                   Our story
                 </Link>
               )}

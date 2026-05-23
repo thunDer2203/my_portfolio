@@ -90,5 +90,31 @@ router.post('/add',protectRoute,async(req,res)=>{
         res.status(500).json({ message: 'Server error',error: error.message });   
     }});
 
+    router.get('/',protectRoute,async(req,res)=>{
+        try {
+            const userId=req.user.id;
+            if(!userId){
+                return res.status(401).json({message:"Unauthorized"})
+            }
+            const cart = await prisma.cart.findFirst({
+                where: { userId },
+                select:{id:true}
+            });
+
+            if (!cart) {
+                return res.status(404).json({ message: 'Cart not found' });
+            }
+            const cartItems = await prisma.cartItem.findMany({
+                where: { cartId: cart.id },
+                include: { product: true }
+            });
+            cart.items = cartItems;
+            res.status(200).json({ cart });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Server error', error: error.message });
+        }
+    });
+
 
     export default router;

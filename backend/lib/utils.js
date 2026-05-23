@@ -7,7 +7,7 @@ const generateToken = (userId,res) => {
     res.cookie("jwt",token,{
         httpOnly:true,
         secure:process.env.NODE_ENV!=="development",
-        sameSite:"strict",
+        sameSite:"lax",
         maxAge:5*60*60*1000
     })
     return token

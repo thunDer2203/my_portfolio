@@ -54,7 +54,7 @@ export default function Navbar({ user, onLogout, onOpenAuth }) {
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <>
-              <span className="text-sm text-bark/70 font-medium">Hi, {user.username}</span>
+              <span className="text-sm text-bark/70 font-medium">Hi, {user.name}</span>
               <button onClick={onLogout} className="text-sm px-4 py-1.5 rounded-full border border-earth-300 text-earth-700 hover:bg-earth-50 transition">Log out</button>
             </>
           ) : (

@@ -13,6 +13,7 @@ export default function AuthModal({ mode, onClose, onSuccess }) {
 
   async function submit(e) {
     e.preventDefault();
+    
     setError(""); setLoading(true);
     try {
       const url  = tab === "login" ? `${BASE}/auth/login` : `${BASE}/auth/register`;
@@ -21,9 +22,10 @@ export default function AuthModal({ mode, onClose, onSuccess }) {
         : { username: form.username, email: form.email, password: form.password, phone: form.phone };
       const res  = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"}, credentials:"include", body: JSON.stringify(body) });
       const data = await res.json();
+      console.log("Auth data:",data);
       if (!res.ok) { setError(data.message || "Something went wrong"); setLoading(false); return; }
       onSuccess(data);
-    } catch { setError("Network error. Is your backend running?"); }
+    } catch { setError("Network error."); }
     setLoading(false);
   }
 
@@ -44,7 +46,7 @@ export default function AuthModal({ mode, onClose, onSuccess }) {
         {/* Tab toggle */}
         <div className="flex rounded-full bg-earth-100 p-1 mb-6">
           {["login","register"].map(t => (
-            <button key={t} onClick={() => { setTab(t); setError(""); }} className={`flex-1 text-sm py-1.5 rounded-full font-medium transition ${tab===t ? "bg-earth-700 text-cream" : "text-earth-600 hover:text-bark"}`}>
+            <button key={t} onClick={() => { setTab(t); setError(""); }} className={`flex-1 text-sm py-1.5 rounded-full font-medium transition hover:bg-amber-900 cursor-pointer ${tab===t ? "bg-amber-800 text-cream" : "text-earth-600 hover:text-bark"}`}>
               {t === "login" ? "Sign in" : "Register"}
             </button>
           ))}
@@ -79,7 +81,7 @@ export default function AuthModal({ mode, onClose, onSuccess }) {
           {error && <p className="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 
           <button type="submit" disabled={loading}
-            className="w-full py-3 rounded-xl bg-earth-700 text-cream font-semibold hover:bg-earth-800 disabled:opacity-60 transition mt-2">
+            className="w-full py-3 rounded-xl bg-earth-700 text-cream font-semibold hover:bg-amber-100 disabled:opacity-60 transition mt-2 cursor-pointer">
             {loading ? "Please wait…" : tab === "login" ? "Sign in" : "Create account"}
           </button>
         </form>

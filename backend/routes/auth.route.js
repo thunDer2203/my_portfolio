@@ -7,6 +7,26 @@ import express from 'express';
 
 const router = express.Router();
 
+
+router.post('/check', async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const newtoken = generateToken(user.id,res);
+    res.status(200).json({ message: 'Token Refreshed', user: user.name });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password,phone } = req.body;
@@ -30,7 +50,7 @@ router.post('/register', async (req, res) => {
       },
     });
     const token = generateToken(newUser.id,res);
-    res.status(201).send("User registered successfully");
+    res.status(201).json({message:"User registered successfully", name: newUser.name});
   }
   catch (error) {    console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -49,7 +69,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({message:"Invalid credentials"})
   }
   const token = generateToken(user.id,res);
-  res.status(200).json({message:"Login successful"})
+  res.status(200).json({message:"Login successful", name: user.name});
 }catch (error) {    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
