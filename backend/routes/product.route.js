@@ -9,7 +9,7 @@ const router=express.Router();
 
 router.get('/',async(req,res)=>{
     try {
-        console.log("Product Route Hit");
+        // console.log("Product Route Hit");
         const products=await prisma.product.findMany({where:{isDeleted:false}});
         res.status(200).json({message:"Products retrieved successfully",products});
     } catch (error) {
@@ -25,7 +25,7 @@ router.post('/add',protectRoute,AssignRole,upload.single("image"),async(req,res)
         }
 
         const {name,description,price,stock}=req.body;
-        console.log(req.body);
+        // console.log(req.body);
         // const id=parseInt(req.params.id);
     //     if(id){
     //         console.log("Product ID provided:", id);

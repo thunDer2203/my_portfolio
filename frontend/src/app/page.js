@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import ProductCarousel from "../components/ProductCarousel";
 import AuthModal from "../components/AuthModal";
 
+
 const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
   const [authModal,  setAuthModal]  = useState(null); // "login" | "register" | null
   const [cartCount,  setCartCount]  = useState(0);
   const [toast,      setToast]      = useState(null);
+  const [cart,       setCart]       = useState(null);
 
   // Load products on mount
   // console.log("Component mounted, BASE =", BASE);
@@ -22,7 +24,7 @@ export default function HomePage() {
     console.log("Fetching products...");
     fetch(`${BASE}/cart`, { credentials: "include" })
       .then(r => { return r.json(); })
-      .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0);})
+      .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0); setCart(d.cart.items); })
       .catch(() => setCartCount(0))
       .finally(() => setLoading(false));
     fetch(`${BASE}/products`, { credentials: "include" })
@@ -62,7 +64,7 @@ export default function HomePage() {
     showToast("Logged out successfully");
   }
 
-  async function handleAddToCart(productId) {
+  async function handleAddToCart(productId,quantity) {
     if (!user) {
       setAuthModal("login");
       showToast("Please sign in to add items to cart", "warn");
@@ -73,11 +75,16 @@ export default function HomePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ items: [{ productId, quantity: 1 }] }),
+        body: JSON.stringify({ items: [{ productId, quantity }] }),
       });
-      if (res.ok) {
-        setCartCount(c => c + 1);
-        showToast("Added to cart!");
+      if (res.ok) { 
+        if(cart.map(i => i.productId).includes(productId)){
+          setCart(c => c.map(i => i.productId === productId ? { ...i, quantity: i.quantity + 1 } : i));
+        } else {
+          setCart(c => [...c, { productId, quantity: 1 }]);
+          setCartCount(c => c + 1);
+          showToast("Added to cart!");
+        }
       } else {
         const d = await res.json();
         showToast(d.message || "Could not add to cart", "error");
@@ -117,12 +124,14 @@ export default function HomePage() {
 
       {/* Cart pill */}
       {cartCount > 0 && (
-        <div className="fixed bottom-6 right-6 z-50 bg-earth-700 text-cream px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+        <Link
+  href="/cart"
+  className="fixed bottom-6 right-6 z-50 bg-earth-700 text-cream px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2 hover:bg-earth-800 transition">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
           </svg>
           {cartCount} item{cartCount !== 1 ? "s" : ""}
-        </div>
+        </Link>
       )}
 
       {/* ── Hero ─────────────────────────────────── */}
@@ -200,8 +209,8 @@ export default function HomePage() {
           </div>
         ) : (
           <div>
-          <ProductCarousel products={products} onAddToCart={handleAddToCart} />
-          {console.log(products)}
+          <ProductCarousel products={products} onAddToCart={handleAddToCart} productsInCart={cart ? cart : []} />
+          {/* {console.log(products)} */}
           </div>
         )}
       </section>
