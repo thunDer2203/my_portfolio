@@ -36,7 +36,7 @@ export default function HomePage() {
     .then(r => r.json())
     .then(d => {
       console.log("Auth check:", d);
-      if (d.user) setUser({ name: d.user });
+      if (d.name) setUser({ name: d.name });
     })
     .catch(() => {})
   }, []);

@@ -20,7 +20,7 @@ router.post('/check', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     const newtoken = generateToken(user.id,res);
-    res.status(200).json({ message: 'Token Refreshed', user: user.name });
+    res.status(200).json({ message: 'Token Refreshed', name: user.name });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

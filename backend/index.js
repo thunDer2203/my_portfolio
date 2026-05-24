@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import orderRoutes from './routes/order.route.js';
 import productRoutes from './routes/product.route.js';
 import cartRoutes from './routes/cart.route.js';
+import paymentRoutes from './routes/payment.route.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use('/api/auth',authRoutes );
 app.use('/api/products',productRoutes);
 app.use('/api/orders',orderRoutes);
 app.use('/api/cart',cartRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
