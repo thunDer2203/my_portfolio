@@ -116,5 +116,27 @@ router.post('/add',protectRoute,async(req,res)=>{
         }
     });
 
+    router.delete('/clear',protectRoute,async(req,res)=>{
+        try {
+            const userId=req.user.id;
+            if(!userId){
+                return res.status(401).json({message:"Unauthorized"})
+            }   
+            const userCartId = await prisma.cart.findFirst({
+                where: { userId },
+                select:{id:true}
+            });
+            if(!userCartId){
+                return res.status(404).json({message:"Cart not found"})
+            }
+            await prisma.cartItem.deleteMany({
+                where: { cartId: userCartId.id }
+            });
+            res.status(200).json({message:"Cart cleared successfully"})
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Server error', error: error.message });
+        }});
+
 
     export default router;

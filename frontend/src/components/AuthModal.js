@@ -94,7 +94,6 @@ export default function AuthModal({
 
   // PAYMENT SUCCESS MODAL
   if (tab === "payment") {
-
     return (
       <div
         className="fixed inset-0 z-[100] flex items-center justify-center px-4"

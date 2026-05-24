@@ -78,7 +78,13 @@ const [paymentOrderId, setPaymentOrderId] = useState("");
         );
 
         const verifyData = await verifyRes.json();
-
+        async function clearCart() {
+          await fetch(`${BASE}/cart/clear`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+        }
+        clearCart();
         // SHOW MODAL
         setPaymentOrderId(verifyData.orderId);
         setShowModal(true);

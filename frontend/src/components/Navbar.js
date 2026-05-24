@@ -160,7 +160,7 @@ export default function Navbar({ onOpenAuth }) {
 
               <button
                 onClick={handleLogout}
-                className="text-sm px-4 py-1.5 rounded-full border border-earth-300 text-earth-700 hover:bg-earth-50 transition"
+                className="cursor-pointer text-sm px-4 py-1.5 rounded-full border border-earth-300 text-earth-700 hover:bg-earth-50 transition"
               >
                 Log out
               </button>
@@ -168,7 +168,7 @@ export default function Navbar({ onOpenAuth }) {
           ) : (
             <button
               onClick={() => onOpenAuth("login")}
-              className="text-sm px-4 py-1.5 rounded-full bg-earth-700 text-cream hover:bg-earth-800 transition"
+              className="cursor-pointer text-sm px-4 py-1.5 rounded-full bg-earth-700 text-cream hover:bg-earth-800 transition"
             >
               Sign in
             </button>
