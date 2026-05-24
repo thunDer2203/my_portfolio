@@ -21,7 +21,7 @@ export default function HomePage() {
   // Load products on mount
   // console.log("Component mounted, BASE =", BASE);
   useEffect(() => {
-    console.log("Fetching products...");
+    // console.log("Fetching products...");
     fetch(`${BASE}/cart`, { credentials: "include" })
       .then(r => { return r.json(); })
       .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0); setCart(d.cart.items); })
@@ -48,7 +48,12 @@ export default function HomePage() {
 
   function handleAuthSuccess(data) {
     // Backend may return user inside data.user or at top level
-    console.log(data);
+    // console.log(data);
+    fetch(`${BASE}/cart`, { credentials: "include" })
+      .then(r => { return r.json(); })
+      .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0); setCart(d.cart.items); })
+      .catch(() => setCartCount(0))
+      .finally(() => setLoading(false));
     const u = data.user || data;
     setUser(u);
     setAuthModal(null);
@@ -61,6 +66,7 @@ export default function HomePage() {
     } catch {}
     setUser(null);
     setCartCount(0);
+    setCart(null);
     showToast("Logged out successfully");
   }
 

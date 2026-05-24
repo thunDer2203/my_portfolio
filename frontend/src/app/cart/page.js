@@ -5,13 +5,98 @@ import Link from "next/link";
 import Image from "next/image";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import {redirect} from "next/navigation";
+import AuthModal from "../../components/AuthModal";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const FALLBACK =
   "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80";
 
+
+
 export default function CartPage() {
+
+    const [showModal, setShowModal] = useState(false);
+const [paymentOrderId, setPaymentOrderId] = useState("");   
+
+    async function handleCheckout() {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          items: cart,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
+
+      amount: data.order.amount,
+
+      currency: data.order.currency,
+
+      name: "Mharo",
+
+      description: "Order Payment",
+
+      order_id: data.order.id,
+
+      handler: async function (response) {
+        const verifyRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/payment/verify`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            credentials: "include",
+
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+
+              razorpay_payment_id:
+                response.razorpay_payment_id,
+
+              razorpay_signature:
+                response.razorpay_signature,
+
+              items: cart,
+            }),
+          }
+        );
+
+        const verifyData = await verifyRes.json();
+
+        // SHOW MODAL
+        setPaymentOrderId(verifyData.orderId);
+        setShowModal(true);
+      },
+
+      theme: {
+        color: "#6B4F3B",
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+
+    razorpay.open();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(null);
@@ -238,7 +323,20 @@ export default function CartPage() {
               </div>
             </div>
           )}
+          <div className="flex justify-center ">
+          <button onClick={handleCheckout} className="bg-amber-800 py-3 w-3/4 px-5 rounded-xl font-semibold hover:bg-amber-900  transition mt-2 cursor-pointer">
+        Checkout -&gt;
+            </button>
+            </div>
         </div>
+        
+        {showModal && (
+  <AuthModal
+    mode="payment"
+    orderId={paymentOrderId}
+    onClose={() => setShowModal(false)}
+  />
+)}
       </section>
 
       <Footer />
