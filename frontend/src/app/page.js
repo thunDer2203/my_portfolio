@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProductCarousel from "../components/ProductCarousel";
 import AuthModal from "../components/AuthModal";
+import { useAuthStore } from "../store/authStore";
 
 
 const BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -12,63 +13,105 @@ const BASE = process.env.NEXT_PUBLIC_API_URL;
 export default function HomePage() {
   const [products,   setProducts]   = useState([]);
   const [loading,    setLoading]    = useState(true);
-  const [user,       setUser]       = useState(null);
+  // const [user,       setUser]       = useState(null);
+const user = useAuthStore((s) => s.user);
+
+const logout = useAuthStore((s) => s.logout);
+
+// const loadingAuth = useAuthStore((s) => s.loading);
+
   const [authModal,  setAuthModal]  = useState(null); // "login" | "register" | null
   const [cartCount,  setCartCount]  = useState(0);
   const [toast,      setToast]      = useState(null);
-  const [cart,       setCart]       = useState(null);
+  const [cart,       setCart]       = useState([]);
 
   // Load products on mount
   // console.log("Component mounted, BASE =", BASE);
   useEffect(() => {
-    // console.log("Fetching products...");
-    fetch(`${BASE}/cart`, { credentials: "include" })
-      .then(r => { return r.json(); })
-      .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0); setCart(d.cart.items); })
-      .catch(() => setCartCount(0))
-      .finally(() => setLoading(false));
-    fetch(`${BASE}/products`, { credentials: "include" })
-      .then(r => {console.log(r); return r.json(); })
-      .then(d => {console.log(d); setProducts(Array.isArray(d) ? d : d.products ?? []);})
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
-    fetch(`${BASE}/auth/check`, {method: "POST", credentials: "include" })
-    .then(r => r.json())
-    .then(d => {
-      console.log("Auth check:", d);
-      if (d.name) setUser({ name: d.name });
-    })
-    .catch(() => {})
-  }, []);
+
+  async function loadData() {
+
+    try {
+
+      // FETCH CART
+      const cartRes = await fetch(`${BASE}/cart`, {
+        credentials: "include",
+      });
+
+      const cartData = await cartRes.json();
+
+      setCartCount(
+        Array.isArray(cartData.cart?.items)
+          ? cartData.cart.items.length
+          : 0
+      );
+
+      setCart(
+        Array.isArray(cartData.cart?.items)
+          ? cartData.cart.items
+          : []
+      );
+
+      // FETCH PRODUCTS
+      const productRes = await fetch(`${BASE}/products`, {
+        credentials: "include",
+      });
+
+      const productData = await productRes.json();
+
+      setProducts(
+        Array.isArray(productData)
+          ? productData
+          : productData.products ?? []
+      );
+
+    } catch (err) {
+
+      console.log(err);
+
+      setProducts([]);
+      setCart([]);
+      setCartCount(0);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }
+
+  loadData();
+
+}, []);
 
   function showToast(msg, type = "success") {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   }
 
-  function handleAuthSuccess(data) {
-    // Backend may return user inside data.user or at top level
-    // console.log(data);
-    fetch(`${BASE}/cart`, { credentials: "include" })
-      .then(r => { return r.json(); })
-      .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0); setCart(d.cart.items); })
-      .catch(() => setCartCount(0))
-      .finally(() => setLoading(false));
-    const u = data.user || data;
-    setUser(u);
-    setAuthModal(null);
-    showToast(`Welcome, ${u.name}!`);
-  }
+  // function handleAuthSuccess(data) {
+  //   // Backend may return user inside data.user or at top level
+  //   // console.log(data);
+  //   fetch(`${BASE}/cart`, { credentials: "include" })
+  //     .then(r => { return r.json(); })
+  //     .then(d => { setCartCount(Array.isArray(d.cart.items) ? d.cart.items.length : 0); setCart(d.cart.items); })
+  //     .catch(() => setCartCount(0))
+  //     .finally(() => setLoading(false));
+  //   const u = data.user || data;
+  //   setUser(u);
+  //   setAuthModal(null);
+  //   showToast(`Welcome, ${u.name}!`);
+  // }
 
-  async function handleLogout() {
-    try {
-      await fetch(`${BASE}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {}
-    setUser(null);
-    setCartCount(0);
-    setCart(null);
-    showToast("Logged out successfully");
-  }
+async function handleLogout() {
+  await logout();
+
+  setCartCount(0);
+
+  setCart([]);
+
+  showToast("Logged out successfully");
+}
 
   async function handleAddToCart(productId,quantity) {
     if (!user) {
@@ -102,20 +145,18 @@ export default function HomePage() {
 
   return (
     <>
-      <Navbar
-        user={user}
-        onLogout={handleLogout}
-        onOpenAuth={setAuthModal}
-      />
+      <Navbar onOpenAuth={setAuthModal} />
 
       {/* Auth modal */}
       {authModal && (
-        <AuthModal
-          mode={authModal}
-          onClose={() => setAuthModal(null)}
-          onSuccess={handleAuthSuccess}
-        />
-      )}
+  <AuthModal
+    mode={authModal}
+    onClose={() => setAuthModal(null)}
+    onSuccess={() => {
+      setAuthModal(null);
+    }}
+  />
+)}
 
       {/* Toast */}
       {toast && (

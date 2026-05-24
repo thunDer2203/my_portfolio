@@ -38,6 +38,7 @@
     },
 
     login: async (email, password) => {
+    
         const res = await fetch(`${BASE}/auth/login`, {
         method: "POST",
         headers: {
@@ -55,9 +56,9 @@
         if (!res.ok) {
         throw new Error(data.message || "Login failed");
         }
-
+        console.log("Attempting login with", data);
         set({
-        user: data.user,
+        user: data.name,
         });
 
         return data;
@@ -80,7 +81,7 @@
   }
 
   set({
-    user: data.user,
+    user: data.name,
   });
 
   return data;

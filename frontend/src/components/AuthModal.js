@@ -1,16 +1,28 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+
 import { useRouter } from "next/navigation";
+
+import { useAuthStore } from "../store/authStore";
 
 export default function AuthModal({
   mode,
   onClose,
   onSuccess,
-  orderId, // pass order id when mode === "payment"
+  orderId,
 }) {
+
   const router = useRouter();
 
-  const [tab, setTab] = useState(mode); // "login" | "register" | "payment"
+  // ZUSTAND
+  const login = useAuthStore((s) => s.login);
+
+  const register = useAuthStore((s) => s.register);
+
+  // STATES
+  const [tab, setTab] = useState(mode);
+
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -19,76 +31,80 @@ export default function AuthModal({
   });
 
   const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(false);
 
-  const BASE =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  // SYNC MODAL MODE
+  useEffect(() => {
+    setTab(mode);
+  }, [mode]);
 
   function handle(e) {
-    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   }
 
   async function submit(e) {
+
     e.preventDefault();
 
     setError("");
+
     setLoading(true);
 
     try {
-      const url =
-        tab === "login"
-          ? `${BASE}/auth/login`
-          : `${BASE}/auth/register`;
 
-      const body =
-        tab === "login"
-          ? {
-              email: form.email,
-              password: form.password,
-            }
-          : {
-              username: form.username,
-              email: form.email,
-              password: form.password,
-              phone: form.phone,
-            };
+      let data;
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(body),
-      });
+      if (tab === "login") {
 
-      const data = await res.json();
+        data = await login(
+          form.email,
+          form.password
+        );
 
-      console.log("Auth data:", data);
+      } else {
 
-      if (!res.ok) {
-        setError(data.message || "Something went wrong");
-        setLoading(false);
-        return;
+        data = await register({
+          username: form.username,
+          email: form.email,
+          password: form.password,
+          phone: form.phone,
+        });
       }
 
-      onSuccess(data);
-    } catch {
-      setError("Network error.");
-    }
+      onSuccess?.(data);
 
-    setLoading(false);
+      onClose?.();
+
+    } catch (err) {
+
+      setError(
+        err.message || "Something went wrong"
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
   }
 
-  // PAYMENT MODE UI
+  // PAYMENT SUCCESS MODAL
   if (tab === "payment") {
+
     return (
-      // console.log("Payment verify response:"),
       <div
         className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-        style={{ background: "rgba(61,43,31,0.5)" }}
+        style={{
+          background: "rgba(61,43,31,0.5)",
+        }}
       >
         <div className="bg-[#FDF8F2] rounded-3xl w-full max-w-sm p-8 shadow-2xl relative text-center">
+
+          {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
             className="absolute top-5 right-5 text-earth-400 hover:text-bark"
@@ -107,7 +123,7 @@ export default function AuthModal({
             </svg>
           </button>
 
-          {/* Success Icon */}
+          {/* SUCCESS ICON */}
           <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -134,6 +150,7 @@ export default function AuthModal({
           </p>
 
           <div className="bg-earth-100 rounded-xl py-3 px-4 mb-6">
+
             <p className="text-xs uppercase tracking-widest text-earth-500 mb-1">
               Order ID
             </p>
@@ -141,28 +158,37 @@ export default function AuthModal({
             <p className="font-semibold text-bark break-all">
               {orderId || "N/A"}
             </p>
+
           </div>
 
           <button
             onClick={() => {
+
               onClose?.();
+
               router.push("/");
             }}
             className="w-full py-3 rounded-xl bg-earth-700 text-cream font-semibold hover:bg-amber-900 transition cursor-pointer"
           >
             Okay
           </button>
+
         </div>
       </div>
     );
   }
 
+  // AUTH MODAL
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-      style={{ background: "rgba(61,43,31,0.5)" }}
+      style={{
+        background: "rgba(61,43,31,0.5)",
+      }}
     >
       <div className="bg-[#FDF8F2] rounded-3xl w-full max-w-md p-8 shadow-2xl relative">
+
+        {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 text-earth-400 hover:text-bark"
@@ -181,8 +207,11 @@ export default function AuthModal({
           </svg>
         </button>
 
+        {/* TITLE */}
         <p className="font-display text-2xl font-bold text-bark mb-1">
-          {tab === "login" ? "Welcome back" : "Create account"}
+          {tab === "login"
+            ? "Welcome back"
+            : "Create account"}
         </p>
 
         <p className="text-sm text-earth-400 mb-6">
@@ -191,30 +220,44 @@ export default function AuthModal({
             : "Join the Mharo community"}
         </p>
 
-        {/* Tab toggle */}
+        {/* TABS */}
         <div className="flex rounded-full bg-earth-100 p-1 mb-6">
+
           {["login", "register"].map((t) => (
             <button
               key={t}
               onClick={() => {
+
                 setTab(t);
+
                 setError("");
               }}
-              className={`flex-1 text-sm py-1.5 rounded-full font-medium transition hover:bg-amber-900 cursor-pointer ${
+              className={`flex-1 text-sm py-1.5 rounded-full font-medium transition cursor-pointer ${
                 tab === t
                   ? "bg-amber-800 text-cream"
                   : "text-earth-600 hover:text-bark"
               }`}
             >
-              {t === "login" ? "Sign in" : "Register"}
+              {t === "login"
+                ? "Sign in"
+                : "Register"}
             </button>
           ))}
+
         </div>
 
-        <form onSubmit={submit} className="space-y-4">
+        {/* FORM */}
+        <form
+          onSubmit={submit}
+          className="space-y-4"
+        >
+
+          {/* REGISTER FIELDS */}
           {tab === "register" && (
             <>
+              {/* USERNAME */}
               <div>
+
                 <label className="block text-xs font-semibold text-earth-600 uppercase tracking-widest mb-1.5">
                   Username
                 </label>
@@ -227,9 +270,12 @@ export default function AuthModal({
                   placeholder="Your name"
                   className="w-full px-4 py-2.5 rounded-xl border border-earth-200 bg-white text-bark placeholder-earth-300 focus:outline-none focus:border-earth-500 transition text-sm"
                 />
+
               </div>
 
+              {/* PHONE */}
               <div>
+
                 <label className="block text-xs font-semibold text-earth-600 uppercase tracking-widest mb-1.5">
                   Phone
                 </label>
@@ -241,11 +287,14 @@ export default function AuthModal({
                   placeholder="10-digit number"
                   className="w-full px-4 py-2.5 rounded-xl border border-earth-200 bg-white text-bark placeholder-earth-300 focus:outline-none focus:border-earth-500 transition text-sm"
                 />
+
               </div>
             </>
           )}
 
+          {/* EMAIL */}
           <div>
+
             <label className="block text-xs font-semibold text-earth-600 uppercase tracking-widest mb-1.5">
               Email
             </label>
@@ -259,9 +308,12 @@ export default function AuthModal({
               placeholder="you@email.com"
               className="w-full px-4 py-2.5 rounded-xl border border-earth-200 bg-white text-bark placeholder-earth-300 focus:outline-none focus:border-earth-500 transition text-sm"
             />
+
           </div>
 
+          {/* PASSWORD */}
           <div>
+
             <label className="block text-xs font-semibold text-earth-600 uppercase tracking-widest mb-1.5">
               Password
             </label>
@@ -275,18 +327,21 @@ export default function AuthModal({
               placeholder="••••••••"
               className="w-full px-4 py-2.5 rounded-xl border border-earth-200 bg-white text-bark placeholder-earth-300 focus:outline-none focus:border-earth-500 transition text-sm"
             />
+
           </div>
 
+          {/* ERROR */}
           {error && (
             <p className="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg">
               {error}
             </p>
           )}
 
+          {/* SUBMIT BUTTON */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-earth-700 text-cream font-semibold hover:bg-amber-100 disabled:opacity-60 transition mt-2 cursor-pointer"
+            className="w-full py-3 rounded-xl bg-earth-700 text-cream font-semibold hover:bg-amber-900 disabled:opacity-60 transition mt-2 cursor-pointer"
           >
             {loading
               ? "Please wait…"
@@ -294,6 +349,7 @@ export default function AuthModal({
               ? "Sign in"
               : "Create account"}
           </button>
+
         </form>
       </div>
     </div>
