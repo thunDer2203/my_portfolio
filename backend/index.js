@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
   origin: ["http://localhost:3000",
-  process.env.FRONTEND_URL],
+  process.env.FRONTEND_URL,"https://ecom-m-front.vercel.app","https://ecom-m-front-thunder2203s-projects.vercel.app"],
   credentials: true
 }));
 app.use('/api/auth',authRoutes );
