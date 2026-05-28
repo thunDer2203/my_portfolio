@@ -9,39 +9,33 @@
     setUser: (user) => set({ user }),
 
     checkAuth: async () => {
-  try {
-    const res = await fetch(`${BASE}/auth/check`, {
-      method: "POST",
-      credentials: "include",
-    });
+        try {
+        const res = await fetch(`${BASE}/auth/check`, {
+            method: "POST",
+            credentials: "include",
+        });
 
-    if (res.status === 401) {
-      set({
-        user: null,
-        loading: false,
-      });
-      return;
-    }
-
-    const data = await res.json();
-
-    set({
-      user: data.name || null,
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    set({
-      user: null,
-    });
-
-  } finally {
-    set({
-      loading: false,
-    });
-  }
-},
+        const data = await res.json();
+        // console.log("Auth check:", data);
+        if (data.name) {
+            set({
+            user: data.name,
+            });
+        } else {
+            set({
+            user: null,
+            });
+        }
+        } catch {
+        set({
+            user: null,
+        });
+        } finally {
+        set({
+            loading: false,
+        });
+        }
+    },
 
     login: async (email, password) => {
     
