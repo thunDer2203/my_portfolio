@@ -8,9 +8,8 @@
 node_modules/
 
 # Prisma generated files
-generated/
-lib/generated/
-prisma/
+    generated/
+    lib/generated/
 
 # Logs
 logs/
