@@ -215,8 +215,8 @@ export default function AuthModal({
 
         <p className="text-sm text-earth-400 mb-6">
           {tab === "login"
-            ? "Sign in to your Mharo account"
-            : "Join the Mharo community"}
+            ? "Sign in to your Ecomm account"
+            : "Join the Ecomm community"}
         </p>
 
         {/* TABS */}

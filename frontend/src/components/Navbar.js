@@ -91,7 +91,7 @@ export default function Navbar({ onOpenAuth }) {
           href="/"
           className="font-display text-2xl font-bold text-earth-800 tracking-tight shrink-0"
         >
-          Mharo
+          Ecomm
         </Link>
 
         {/* DESKTOP LINKS */}

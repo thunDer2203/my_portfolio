@@ -265,7 +265,7 @@ async function handleLogout() {
       {/* ── Values ───────────────────────────────── */}
       <section className="bg-earth-50 py-20">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="font-display text-3xl font-bold text-bark text-center mb-14">Why Mharo?</h2>
+          <h2 className="font-display text-3xl font-bold text-bark text-center mb-14">Why Ecomm?</h2>
           <div className="grid sm:grid-cols-3 gap-8">
             {[
               { icon:"🌿", title:"All-natural",   desc:"Every ingredient and material is responsibly sourced from nature — no synthetics." },
@@ -288,7 +288,7 @@ async function handleLogout() {
           <div className="rounded-3xl bg-earth-700 text-cream px-10 py-16 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_70%_50%,#fff,transparent)]" />
             <h2 className="font-display text-4xl font-bold mb-4 relative z-10">
-              Join the Mharo community
+              Join the Ecomm community
             </h2>
             <p className="text-cream/70 mb-8 relative z-10 max-w-md mx-auto">
               Create a free account to save your cart, track orders, and get early access to new arrivals.
