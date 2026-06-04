@@ -5,7 +5,7 @@ import cloudinary from '../lib/cloudinary.js';
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder:         'mharo/products',
+    folder:         'portfolio',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
   },

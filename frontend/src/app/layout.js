@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
-import AuthProvider from "../components/AuthProvider";
+import PortfolioProvider from "../components/PortfolioProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,9 +26,9 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <PortfolioProvider>
+        {children}
+        </PortfolioProvider>
       </body>
     </html>
   );

@@ -1,35 +1,67 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
-import authRoutes from './routes/auth.route.js';
-import cookieParser from 'cookie-parser';
-import orderRoutes from './routes/order.route.js';
-import productRoutes from './routes/product.route.js';
-import cartRoutes from './routes/cart.route.js';
-import paymentRoutes from './routes/payment.route.js';
-
+import dotenv from "dotenv";
 dotenv.config();
+
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import resumeRoutes from "./routes/resume.route.js";
+import authRoutes from "./routes/auth.route.js";
+import projectRoutes from "./routes/project.route.js";
+import skillRoutes from "./routes/skill.route.js";
+import contactRoutes from "./routes/contact.route.js";
+import experienceRoutes from "./routes/experience.route.js";
+import socialRoutes from "./routes/social.route.js";
+import heroRoutes from "./routes/hero.route.js";
+import aboutRoutes from "./routes/about.route.js";
 
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors({
-  origin: ["http://localhost:3000",
-  process.env.FRONTEND_URL,"https://ecom-m-front.vercel.app","https://ecom-m-front-thunder2203s-projects.vercel.app"],
-  credentials: true
-}));
-app.use('/api/auth',authRoutes );
-app.use('/api/products',productRoutes);
-app.use('/api/orders',orderRoutes);
-app.use('/api/cart',cartRoutes);
-app.use('/api/payment', paymentRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+const PORT = process.env.PORT || 5000;
+
+
+app.use(express.json());
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
+
+
+
+app.get("/", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Portfolio CMS API Running 🚀",
+  });
 });
 
+
+app.use("/api/auth", authRoutes);
+
+app.use("/api/projects", projectRoutes);
+
+app.use("/api/skills", skillRoutes);
+
+app.use("/api/experience", experienceRoutes);
+
+app.use("/api/socials", socialRoutes);
+
+app.use("/api/contact", contactRoutes);
+
+app.use("/api/resume", resumeRoutes);
+
+app.use("/api/hero", heroRoutes);
+
+app.use("/api/about", aboutRoutes);
+
+
+
+
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Portfolio CMS running on port ${PORT}`);
 });

@@ -1,37 +1,99 @@
-import jwt from "jsonwebtoken"
-import prisma from "../lib/db.js"
+import jwt from "jsonwebtoken";
+import prisma from "../lib/db.js";
 
+/* -------------------------------------------------------------------------- */
+/*                              PROTECT ROUTE                                 */
+/* -------------------------------------------------------------------------- */
 
-export const protectRoute=async (req,res,next)=>{
-    const token=req.cookies.jwt
+export const protectRoute = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
 
-    if(!token){
-        return res.status(401).json("Unauthorized")
+    /* ------------------------------ No token ------------------------------ */
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
-const decoded=jwt.verify(token,process.env.JWT_SECRET)
 
-const user =await prisma.user.findUnique({ where: { id: decoded.userId },
-    select: {
-    id: true,
-    name: true,
-    email: true
-  } });
-// console.log("Decoded user ID from token:", user)
-req.user=user
-next()
-}
+    /* ----------------------------- Verify JWT ----------------------------- */
 
-export const AssignRole= async(req,res,next)=>{
-    const userId=req.user.id;
-    const user=await prisma.user.findUnique({where:{id:userId}})
-    if(user.active === 0){
-        return res.status(403).json("Forbidden: User account is inactive");
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    /* ------------------------------ Find user ----------------------------- */
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    /* ------------------------------ No user ------------------------------- */
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
     }
-    if(user.role!=="admin"){
-        return res.status(403).json({
-      message: "Forbidden: Admins only",});
-    }
-    req.userRole = user.role;
+
+    /* -------------------------- Attach to request ------------------------- */
+
+    req.user = user;
+
     next();
-}
+  } catch (error) {
+    console.error("AUTH MIDDLEWARE ERROR:", error);
 
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
+  }
+};
+
+/* -------------------------------------------------------------------------- */
+/*                               ADMIN ONLY                                   */
+/* -------------------------------------------------------------------------- */
+
+export const adminOnly = async (req, res, next) => {
+  try {
+    /* ------------------------- Check authenticated ------------------------ */
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    /* ---------------------------- Check role ----------------------------- */
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied: Admins only",
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("ADMIN MIDDLEWARE ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};

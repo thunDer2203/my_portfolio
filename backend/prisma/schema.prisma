@@ -1,98 +1,256 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-   url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
-  user
   admin
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String
-  email    String   @unique
-  phone    String   @unique
-  password String
-  role     Role     @default(user)
-
-  orders   Order[]
-  cart     Cart[]
-}
-
-model Product {
-  id          Int         @id @default(autoincrement())
-  name        String
-  price       Float
-  description String
-  stock       Int
-  isDeleted Boolean @default(false)
-  image     String
-
-  orderItems  OrderItem[]
-  cartItems   CartItem[]
-}
-
-model Order {
-  id          Int         @id @default(autoincrement())
-
-  userId      Int
-  totalPrice  Float
-  status      String      @default("pending")
-
-  paymentId   String?
-  razorpayOrderId String?
-
-  user        User        @relation(fields: [userId], references: [id])
-
-  items       OrderItem[]
-
-  createdAt   DateTime    @default(now())
-}
-
-model OrderItem {
   id          Int       @id @default(autoincrement())
 
-  orderId     Int
-  productId   Int
+  name        String
+  email       String    @unique
+  password    String
 
-  quantity    Int
-  price       Float
+  role        Role      @default(admin)
 
-  order       Order     @relation(fields: [orderId], references: [id])
-  product     Product   @relation(fields: [productId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
+//////////////////////////////////////////////////
+// HERO SECTION
+//////////////////////////////////////////////////
 
-model Cart {
-  id        Int        @id @default(autoincrement())
+model Hero {
+  id            Int       @id @default(autoincrement())
 
-  userId    Int        @unique
+  name          String
+  title         String
+  subtitle      String?
 
-  user      User       @relation(fields: [userId], references: [id])
+  description   String?
 
-  items     CartItem[]
+  profileImage  String?
 
-  createdAt DateTime   @default(now())
+  resumeUrl     String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
-model CartItem {
-  id         Int       @id @default(autoincrement())
+//////////////////////////////////////////////////
+// ABOUT SECTION
+//////////////////////////////////////////////////
 
-  cartId     Int
-  productId  Int
+model About {
+  id            Int       @id @default(autoincrement())
 
-  quantity   Int
+  heading       String
+  content       String
 
-  cart        Cart      @relation(fields: [cartId], references: [id])
-  product     Product   @relation(fields: [productId], references: [id])
+  image         String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+//////////////////////////////////////////////////
+// SKILLS SECTION
+//////////////////////////////////////////////////
+
+model Skill {
+  id            Int       @id @default(autoincrement())
+
+  name          String
+
+  category      String
+
+  level         Int?
+
+  icon          String?
+
+  description   String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+//////////////////////////////////////////////////
+// PROJECTS SECTION
+//////////////////////////////////////////////////
+
+model Project {
+  id              Int       @id @default(autoincrement())
+
+  title           String
+
+  slug            String    @unique
+
+  shortDescription String
+
+  longDescription String?
+
+  image           String?
+
+  githubUrl       String?
+
+  liveUrl         String?
+
+  featured        Boolean   @default(false)
+
+  techStack       String[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+//////////////////////////////////////////////////
+// EXPERIENCE SECTION
+//////////////////////////////////////////////////
+
+model Experience {
+  id                Int       @id @default(autoincrement())
+
+  company           String
+
+  role              String
+
+  location          String?
+
+  description       String?
+
+  startDate         DateTime
+
+  endDate           DateTime?
+
+  currentlyWorking  Boolean   @default(false)
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+//////////////////////////////////////////////////
+// EDUCATION SECTION
+//////////////////////////////////////////////////
+
+model Education {
+  id            Int       @id @default(autoincrement())
+
+  institution   String
+
+  degree        String
+
+  field         String?
+
+  grade         String?
+
+  startYear     Int?
+
+  endYear       Int?
+
+  description   String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+//////////////////////////////////////////////////
+// CERTIFICATES SECTION
+//////////////////////////////////////////////////
+
+model Certificate {
+  id            Int       @id @default(autoincrement())
+
+  title         String
+
+  issuer        String
+
+  issueDate     DateTime?
+
+  credentialUrl String?
+
+  image         String?
+
+  createdAt     DateTime  @default(now())
+}
+
+//////////////////////////////////////////////////
+// ACHIEVEMENTS SECTION
+//////////////////////////////////////////////////
+
+model Achievement {
+  id            Int       @id @default(autoincrement())
+
+  title         String
+
+  description   String
+
+  createdAt     DateTime  @default(now())
+}
+
+//////////////////////////////////////////////////
+// SOCIAL LINKS
+//////////////////////////////////////////////////
+
+model SocialLink {
+  id            Int       @id @default(autoincrement())
+
+  platform      String
+
+  url           String
+
+  icon          String?
+
+  createdAt     DateTime  @default(now())
+}
+
+//////////////////////////////////////////////////
+// CONTACT MESSAGES
+//////////////////////////////////////////////////
+
+model ContactMessage {
+  id            Int       @id @default(autoincrement())
+
+  name          String
+
+  email         String
+
+  subject       String?
+
+  message       String
+
+  isRead        Boolean   @default(false)
+
+  createdAt     DateTime  @default(now())
+}
+
+//////////////////////////////////////////////////
+// TERMINAL COMMANDS
+//////////////////////////////////////////////////
+
+model TerminalCommand {
+  id            Int       @id @default(autoincrement())
+
+  command       String    @unique
+
+  response      String
+
+  createdAt     DateTime  @default(now())
+}
+
+model Resume {
+  id        Int      @id @default(autoincrement())
+
+  title     String
+  fileUrl   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
