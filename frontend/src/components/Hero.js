@@ -40,7 +40,7 @@
 
     const [showPortfolio, setShowPortfolio] = useState(false);
 
-    const [bootComplete, setBootComplete] = useState(false);
+    const bootComplete = lineIndex >= bootLines.length;
     const [command, setCommand] = useState("");
 
     const inputRef = useRef(null);
@@ -50,11 +50,6 @@
 
     useEffect(() => {
       if (bootComplete) return;
-
-      if (lineIndex >= bootLines.length) {
-        setBootComplete(true);
-        return;
-      }
 
       const timeout = setTimeout(() => {
         const line = bootLines[lineIndex];
