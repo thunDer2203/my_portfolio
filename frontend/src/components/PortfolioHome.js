@@ -98,6 +98,7 @@ function ProjectCard({ project, index }) {
           ))}
         </div>
       )}
+      <div className="card-links flex flex-col gap-2 mt-auto">
       {project.liveUrl && (
         <a
           href={project.liveUrl}
@@ -105,8 +106,9 @@ function ProjectCard({ project, index }) {
           rel="noopener noreferrer"
           className="card-link"
         >
-          View project →
+        View project →
         </a>
+        
       )}
       {project.githubUrl && (
         <a
@@ -118,6 +120,7 @@ function ProjectCard({ project, index }) {
           View github →
         </a>
       )}
+      </div>
     </div>
   );
 }
