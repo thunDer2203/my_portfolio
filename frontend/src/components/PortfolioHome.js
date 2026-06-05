@@ -108,6 +108,16 @@ function ProjectCard({ project, index }) {
           View project →
         </a>
       )}
+      {project.githubUrl && (
+        <a
+          href={project.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="card-link"
+        >
+          View github →
+        </a>
+      )}
     </div>
   );
 }
