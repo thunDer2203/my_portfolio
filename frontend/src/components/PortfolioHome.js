@@ -549,6 +549,7 @@ export default function PortfolioHome({ onReturn }) {
           overflow: hidden;
         }
         .project-card::before {
+          pointer-events: none;
           content: '';
           position: absolute; inset: 0;
           background: radial-gradient(circle at 50% 0%, rgba(74,222,128,.07), transparent 70%);
