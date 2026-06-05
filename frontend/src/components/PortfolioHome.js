@@ -729,7 +729,7 @@ export default function PortfolioHome({ onReturn }) {
           <span className="hero-bg-text">DEV</span>
 
           <div className="hero-content">
-            <p className="hero-eyebrow">// Full Stack Engineer</p>
+            <p className="hero-eyebrow">{"// Full Stack Engineer"}</p>
             <h1
               className="hero-name"
               style={{ transform: `translate(${px * 0.3}px, ${py * 0.2}px)` }}
@@ -853,7 +853,7 @@ export default function PortfolioHome({ onReturn }) {
           <section className="section" id="experience">
             <p className="section-label">Experience</p>
             <h2 style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 800, letterSpacing: "-.02em", marginBottom: "3.5rem" }}>
-              Where I've Worked
+              Where I&apos;ve Worked
             </h2>
             <div className="exp-list">
               {experience.map((e, i) => (
@@ -869,7 +869,7 @@ export default function PortfolioHome({ onReturn }) {
         <section className="section" id="contact">
           <p className="section-label">Contact</p>
           <h2 style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 800, letterSpacing: "-.02em", marginBottom: "1rem" }}>
-            Let's Build Together
+            Let&apos;s Build Together
           </h2>
           <p style={{ color: "rgba(232,234,240,.5)", fontSize: "1rem", maxWidth: 480, lineHeight: 1.7 }}>
             Open to freelance, full-time, and interesting problems. Drop a message.
