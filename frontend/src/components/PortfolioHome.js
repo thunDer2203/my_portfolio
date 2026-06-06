@@ -98,6 +98,7 @@ function ProjectCard({ project, index }) {
           ))}
         </div>
       )}
+      <div className="card-links flex flex-col gap-2 mt-auto">
       {project.liveUrl && (
         <a
           href={project.liveUrl}
@@ -105,7 +106,18 @@ function ProjectCard({ project, index }) {
           rel="noopener noreferrer"
           className="card-link"
         >
-          View project →
+        View project →
+        </a>
+        
+      )}
+      {project.githubUrl && (
+        <a
+          href={project.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="card-link"
+        >
+          View github →
         </a>
         
       )}
@@ -119,6 +131,7 @@ function ProjectCard({ project, index }) {
           View github →
         </a>
       )}
+      </div>
     </div>
   );
 }
@@ -560,6 +573,7 @@ export default function PortfolioHome({ onReturn }) {
           overflow: hidden;
         }
         .project-card::before {
+          pointer-events: none;
           content: '';
           position: absolute; inset: 0;
           background: radial-gradient(circle at 50% 0%, rgba(74,222,128,.07), transparent 70%);
