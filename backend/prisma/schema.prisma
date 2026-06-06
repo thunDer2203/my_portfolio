@@ -8,41 +8,37 @@ datasource db {
 }
 
 enum Role {
-  admin
+admin
+user
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
+id          Int       @id @default(autoincrement())
 
-  name        String
-  email       String    @unique
-  password    String
+name        String
+email       String    @unique
+password    String
+title         String?
 
-  role        Role      @default(admin)
+username    String?   @unique
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
+role        Role      @default(user)
 
-//////////////////////////////////////////////////
-// HERO SECTION
-//////////////////////////////////////////////////
+createdAt   DateTime  @default(now())
+updatedAt   DateTime  @updatedAt
 
-model Hero {
-  id            Int       @id @default(autoincrement())
+about        About?
 
-  name          String
-  title         String
-  subtitle      String?
+skills       Skill[]
+projects     Project[]
+experiences  Experience[]
+educations   Education[]
+certificates Certificate[]
+achievements Achievement[]
+socials      SocialLink[]
+resume       Resume?
+contacts     ContactMessage[]
 
-  description   String?
-
-  profileImage  String?
-
-  resumeUrl     String?
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 //////////////////////////////////////////////////
@@ -50,15 +46,18 @@ model Hero {
 //////////////////////////////////////////////////
 
 model About {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  heading       String
-  content       String
+userId        Int?      @unique
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  image         String?
+heading       String
+content       String
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+image         String?
+
+createdAt     DateTime  @default(now())
+updatedAt     DateTime  @updatedAt
 }
 
 //////////////////////////////////////////////////
@@ -66,20 +65,23 @@ model About {
 //////////////////////////////////////////////////
 
 model Skill {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  name          String
+userId        Int?
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  category      String
+name          String
 
-  level         Int?
+category      String
 
-  icon          String?
+level         Int?
 
-  description   String?
+icon          String?
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+description   String?
+
+createdAt     DateTime  @default(now())
+updatedAt     DateTime  @updatedAt
 }
 
 //////////////////////////////////////////////////
@@ -87,28 +89,33 @@ model Skill {
 //////////////////////////////////////////////////
 
 model Project {
-  id              Int       @id @default(autoincrement())
+id                Int       @id @default(autoincrement())
 
-  title           String
+userId            Int?
+user              User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  slug            String    @unique
+title             String
 
-  shortDescription String
+slug              String
 
-  longDescription String?
+shortDescription  String
 
-  image           String?
+longDescription   String?
 
-  githubUrl       String?
+image             String?
 
-  liveUrl         String?
+githubUrl         String?
 
-  featured        Boolean   @default(false)
+liveUrl           String?
 
-  techStack       String[]
+featured          Boolean   @default(false)
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+techStack         String[]
+
+createdAt         DateTime  @default(now())
+updatedAt         DateTime  @updatedAt
+
+@@unique([userId, slug])
 }
 
 //////////////////////////////////////////////////
@@ -116,24 +123,27 @@ model Project {
 //////////////////////////////////////////////////
 
 model Experience {
-  id                Int       @id @default(autoincrement())
+id                Int       @id @default(autoincrement())
 
-  company           String
+userId            Int?
+user              User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  role              String
+company           String
 
-  location          String?
+role              String
 
-  description       String?
+location          String?
 
-  startDate         DateTime
+description       String?
 
-  endDate           DateTime?
+startDate         DateTime
 
-  currentlyWorking  Boolean   @default(false)
+endDate           DateTime?
 
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+currentlyWorking  Boolean   @default(false)
+
+createdAt         DateTime  @default(now())
+updatedAt         DateTime  @updatedAt
 }
 
 //////////////////////////////////////////////////
@@ -141,24 +151,27 @@ model Experience {
 //////////////////////////////////////////////////
 
 model Education {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  institution   String
+userId        Int?
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  degree        String
+institution   String
 
-  field         String?
+degree        String
 
-  grade         String?
+field         String?
 
-  startYear     Int?
+grade         String?
 
-  endYear       Int?
+startYear     Int?
 
-  description   String?
+endYear       Int?
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+description   String?
+
+createdAt     DateTime  @default(now())
+updatedAt     DateTime  @updatedAt
 }
 
 //////////////////////////////////////////////////
@@ -166,19 +179,22 @@ model Education {
 //////////////////////////////////////////////////
 
 model Certificate {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  title         String
+userId        Int?
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  issuer        String
+title         String
 
-  issueDate     DateTime?
+issuer        String
 
-  credentialUrl String?
+issueDate     DateTime?
 
-  image         String?
+credentialUrl String?
 
-  createdAt     DateTime  @default(now())
+image         String?
+
+createdAt     DateTime  @default(now())
 }
 
 //////////////////////////////////////////////////
@@ -186,13 +202,16 @@ model Certificate {
 //////////////////////////////////////////////////
 
 model Achievement {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  title         String
+userId        Int?
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  description   String
+title         String
 
-  createdAt     DateTime  @default(now())
+description   String
+
+createdAt     DateTime  @default(now())
 }
 
 //////////////////////////////////////////////////
@@ -200,15 +219,18 @@ model Achievement {
 //////////////////////////////////////////////////
 
 model SocialLink {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  platform      String
+userId        Int?
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  url           String
+platform      String
 
-  icon          String?
+url           String
 
-  createdAt     DateTime  @default(now())
+icon          String?
+
+createdAt     DateTime  @default(now())
 }
 
 //////////////////////////////////////////////////
@@ -216,41 +238,38 @@ model SocialLink {
 //////////////////////////////////////////////////
 
 model ContactMessage {
-  id            Int       @id @default(autoincrement())
+id            Int       @id @default(autoincrement())
 
-  name          String
+userId        Int?
+user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  email         String
+name          String
 
-  subject       String?
+email         String
 
-  message       String
+subject       String?
 
-  isRead        Boolean   @default(false)
+message       String
 
-  createdAt     DateTime  @default(now())
+isRead        Boolean   @default(false)
+
+createdAt     DateTime  @default(now())
 }
 
+
 //////////////////////////////////////////////////
-// TERMINAL COMMANDS
+// RESUME
 //////////////////////////////////////////////////
-
-model TerminalCommand {
-  id            Int       @id @default(autoincrement())
-
-  command       String    @unique
-
-  response      String
-
-  createdAt     DateTime  @default(now())
-}
 
 model Resume {
-  id        Int      @id @default(autoincrement())
+id        Int       @id @default(autoincrement())
 
-  title     String
-  fileUrl   String
+  userId    Int?     @unique
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+title     String
+fileUrl   String
+
+createdAt DateTime  @default(now())
+updatedAt DateTime  @updatedAt
 }

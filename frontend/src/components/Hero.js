@@ -7,6 +7,7 @@
   import { useExperienceStore } from "../store/experienceStore";
   import { useSocialStore } from "../store/socialStore";
   import { useAboutStore } from "../store/aboutStore";
+  import RegisterPage from "./Register";
 
   export default function Hero() {
     const bootLines = [
@@ -39,6 +40,7 @@
   const socials = useSocialStore((s) => s.socials);
 
     const [showPortfolio, setShowPortfolio] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
 
     const bootComplete = lineIndex >= bootLines.length;
     const [command, setCommand] = useState("");
@@ -334,7 +336,9 @@
     return (
       <>
       {showPortfolio && <PortfolioHome onReturn={() => setShowPortfolio(false)} />}
-      {!showPortfolio  && (<section className="relative min-h-screen bg-[#050505] overflow-hidden">
+        {showRegister && (<RegisterPage onReturn={() => setShowRegister(false)}/>
+)}
+      {!showPortfolio  && !showRegister && (<section className="relative min-h-screen bg-[#050505] overflow-hidden">
         {/* GRID */}
 
         <div
@@ -370,6 +374,16 @@
       shubham@portfolio:~
     </span>
   </div>
+  <div className="flex items-center gap-2">
+  <button
+  onClick={() => setShowRegister(true)}
+  className="px-4 py-2 text-sm font-medium rounded-lg
+             border border-white/20 text-white
+             hover:bg-white hover:text-black
+             transition-all duration-200 cursor-pointer"
+>
+  Create Portfolio
+</button>
 
   <button
     onClick={() => setShowPortfolio(true)}
@@ -380,6 +394,7 @@
   >
     View Portfolio →
   </button>
+  </div>
 </div>
 
             {/* TERMINAL */}

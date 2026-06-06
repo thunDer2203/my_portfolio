@@ -69,14 +69,20 @@ router.get("/check", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const {
+      name,
+      username,
+      email,
+      password,
+      title,
+    } = req.body;
 
     /* ------------------------------ Validation ----------------------------- */
 
-    if (!username || !email || !password) {
+    if (!name || !email || !password || !username) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be filled",
+        message: "Name, username, email and password are required",
       });
     }
 
@@ -87,32 +93,49 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    /* ------------------------------ Existing user ----------------------------- */
+    /* --------------------------- Existing Email --------------------------- */
 
-    const existingUser = await prisma.user.findUnique({
+    const existingEmail = await prisma.user.findUnique({
       where: {
         email,
       },
     });
 
-    if (existingUser) {
+    if (existingEmail) {
       return res.status(400).json({
         success: false,
-        message: "User already exists",
+        message: "Email already exists",
       });
     }
 
-    /* ----------------------------- Hash password ---------------------------- */
+    /* -------------------------- Existing Username ------------------------- */
+
+    const existingUsername = await prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (existingUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "Username already taken",
+      });
+    }
+
+    /* ----------------------------- Hash Password ---------------------------- */
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    /* ------------------------------- Create user ------------------------------ */
+    /* ------------------------------- Create User ------------------------------ */
 
     const newUser = await prisma.user.create({
       data: {
-        name: username,
+        name,
+        username,
         email,
         password: hashedPassword,
+        title: title || null,
       },
     });
 
@@ -122,26 +145,28 @@ router.post("/register", async (req, res) => {
 
     /* -------------------------------- Response -------------------------------- */
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Account created successfully",
       user: {
         id: newUser.id,
         name: newUser.name,
+        username: newUser.username,
         email: newUser.email,
+        title: newUser.title,
         role: newUser.role,
       },
+      portfolioUrl: `/${newUser.username}`,
     });
   } catch (error) {
     console.error("REGISTER ERROR:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Server error",
     });
   }
 });
-
 /* -------------------------------------------------------------------------- */
 /*                                    LOGIN                                   */
 /* -------------------------------------------------------------------------- */
