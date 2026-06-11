@@ -7,9 +7,20 @@
   import { useExperienceStore } from "../store/experienceStore";
   import { useSocialStore } from "../store/socialStore";
   import { useAboutStore } from "../store/aboutStore";
+  import { useAuthStore } from "../store/authStore";
   import RegisterPage from "./Register";
+  import DashboardPage from "./DashBoard";
+  import { usePortfolioStore } from "../store/portfolioStore";
 
   export default function Hero() {
+
+        const username = usePortfolioStore(
+  (s) => s.username
+);
+
+    
+const terminalUser = username || "shubham";
+
     const bootLines = [
     "$ boot portfolio.sys",
     "",
@@ -22,7 +33,7 @@
     "[OK] Portfolio API connected",
     "[OK] Visitor access granted",
     "",
-    "Welcome to SHUBHAM.OS v2.0",
+    `Welcome to ${terminalUser}.OS v2.0`,
     "",
     'Type "help" for available commands.',
     "",
@@ -32,7 +43,12 @@
     const [currentLine, setCurrentLine] = useState("");
     const [lineIndex, setLineIndex] = useState(0);
     const [charIndex, setCharIndex] = useState(0);
+    const [showDashboard, setShowDashboard] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
+
+
+    const { user } = useAuthStore();
     const about = useAboutStore((s) => s.about);
     const skills = useSkillStore((s) => s.skills);
   const projects = useProjectStore((s) => s.projects);
@@ -51,6 +67,7 @@
     /* ---------------- Boot Animation ---------------- */
 
     useEffect(() => {
+      setMounted(true);
       if (bootComplete) return;
 
       const timeout = setTimeout(() => {
@@ -131,7 +148,7 @@
 
     setHistory((prev) => [
       ...prev,
-      "shubham@portfolio:~$ about",
+      `${terminalUser}@portfolio:~$ about`,
       ...output,
     ]);
 
@@ -153,7 +170,7 @@
     if (cmd === "exit") {
       setHistory((prev) => [
         ...prev,
-        "shubham@portfolio:~$ exit",
+        `${terminalUser}@portfolio:~$ exit`,
         "",
         "Launching portfolio interface...",
         "",
@@ -170,7 +187,7 @@
     if (cmd === "resume") {
       setHistory((prev) => [
         ...prev,
-        "shubham@portfolio:~$ resume",
+        `${terminalUser}@portfolio:~$ resume`,
         "",
         "Downloading resume...",
         "",
@@ -204,7 +221,7 @@
 
     setHistory((prev) => [
       ...prev,
-      "shubham@portfolio:~$ skills",
+      `${terminalUser}@portfolio:~$ skills`,
       ...output,
     ]);
 
@@ -227,7 +244,7 @@
 
       setHistory((prev) => [
         ...prev,
-        "shubham@portfolio:~$ projects",
+        `${terminalUser}@portfolio:~$ projects`,
         ...output,
       ]);
 
@@ -251,7 +268,7 @@
 
       setHistory((prev) => [
         ...prev,
-        "shubham@portfolio:~$ experience",
+        `${terminalUser}@portfolio:~$ experience`,
         ...output,
       ]);
 
@@ -283,7 +300,7 @@
 
     setHistory((prev) => [
       ...prev,
-      "shubham@portfolio:~$ socials",
+      `${terminalUser}@portfolio:~$ socials`,
       ...output,
     ]);
 
@@ -304,7 +321,7 @@
 
       setHistory((prev) => [
         ...prev,
-        "shubham@portfolio:~$ contact",
+        `${terminalUser}@portfolio:~$ contact`,
         ...output,
       ]);
 
@@ -321,7 +338,7 @@
 
     setHistory((prev) => [
       ...prev,
-      `shubham@portfolio:~$ ${cmd}`,
+      `${terminalUser}@portfolio:~$ ${cmd}`,
       ...output,
     ]);
 
@@ -332,13 +349,15 @@
     }, 0);
   };
 
-
+  if(!mounted) return null;
     return (
       <>
-      {showPortfolio && <PortfolioHome onReturn={() => setShowPortfolio(false)} />}
+      {showDashboard && (<DashboardPage onReturn={() => setShowDashboard(false)}/>
+)}
+      {showPortfolio && <PortfolioHome onReturn={() => setShowPortfolio(false)} username={username} />}
         {showRegister && (<RegisterPage onReturn={() => setShowRegister(false)}/>
 )}
-      {!showPortfolio  && !showRegister && (<section className="relative min-h-screen bg-[#050505] overflow-hidden">
+      {!showPortfolio  && !showRegister && !showDashboard && (<section className="relative min-h-screen bg-[#050505] overflow-hidden">
         {/* GRID */}
 
         <div
@@ -371,18 +390,24 @@
     <div className="w-3 h-3 rounded-full bg-green-500" />
 
     <span className="ml-4 text-white/50 text-sm font-mono">
-      shubham@portfolio:~
+     { `${terminalUser}@portfolio:~$`}
     </span>
   </div>
   <div className="flex items-center gap-2">
   <button
-  onClick={() => setShowRegister(true)}
+  onClick={() => {
+    if (user) {
+      setShowDashboard(true);
+    } else {
+      setShowRegister(true);
+    }
+  }}
   className="px-4 py-2 text-sm font-medium rounded-lg
              border border-white/20 text-white
              hover:bg-white hover:text-black
              transition-all duration-200 cursor-pointer"
 >
-  Create Portfolio
+  {user ? "Dashboard" : "Create Portfolio"}
 </button>
 
   <button
@@ -394,6 +419,7 @@
   >
     View Portfolio →
   </button>
+
   </div>
 </div>
 
@@ -436,7 +462,7 @@
 
                   <div className="flex flex-wrap items-center mt-2">
                     <span className="text-white font-semibold">
-    shubham@portfolio:~$&nbsp;
+    {`${terminalUser}`}@portfolio:~$&nbsp;
   </span>
 
                     <span>{command}</span>

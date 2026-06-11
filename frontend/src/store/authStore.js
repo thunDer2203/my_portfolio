@@ -11,15 +11,15 @@
     checkAuth: async () => {
         try {
         const res = await fetch(`${BASE}/auth/check`, {
-            method: "POST",
+            method: "GET",
             credentials: "include",
         });
 
         const data = await res.json();
         // console.log("Auth check:", data);
-        if (data.name) {
+        if (data.user) {
             set({
-            user: data.name,
+            user: data.user,
             });
         } else {
             set({
@@ -58,7 +58,7 @@
         }
         console.log("Attempting login with", data);
         set({
-        user: data.name,
+        user: data.user,
         });
 
         return data;
@@ -81,7 +81,7 @@
   }
 
   set({
-    user: data.name,
+    user: data.user,
   });
 
   return data;

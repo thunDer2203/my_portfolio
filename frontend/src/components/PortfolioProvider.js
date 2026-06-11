@@ -2,22 +2,44 @@
 
 import { useEffect } from "react";
 
-import { useHeroStore } from "../store/heroStore";
 import { useAboutStore } from "../store/aboutStore";
 import { useSkillStore } from "../store/skillStore";
 import { useProjectStore } from "../store/projectStore";
 import { useExperienceStore } from "../store/experienceStore";
 import { useSocialStore } from "../store/socialStore";
+import { useAuthStore } from "../store/authStore";
+import { usePortfolioStore } from "../store/portfolioStore";
 
-export default function PortfolioProvider({ children }) {
+export default function PortfolioProvider({
+  children,
+}) {
+  const username = usePortfolioStore(
+    (s) => s.username
+  );
+
   useEffect(() => {
-    useHeroStore.getState().fetchHero();
-    useAboutStore.getState().fetchAbout();
-    useSkillStore.getState().fetchSkills();
-    useProjectStore.getState().fetchProjects();
-    useExperienceStore.getState().fetchExperience();
-    useSocialStore.getState().fetchSocials();
-  }, []);
+    useAuthStore.getState().checkAuth();
+
+    useAboutStore
+      .getState()
+      .fetchAbout(username);
+
+    useSkillStore
+      .getState()
+      .fetchSkills(username);
+
+    useProjectStore
+      .getState()
+      .fetchProjects(username);
+
+    useExperienceStore
+      .getState()
+      .fetchExperience(username);
+
+    useSocialStore
+      .getState()
+      .fetchSocials(username);
+  }, [username]);
 
   return children;
 }

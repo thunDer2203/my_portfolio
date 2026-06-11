@@ -6,13 +6,17 @@ export const useProjectStore = create((set) => ({
   projects: [],
   loading: false,
 
-  fetchProjects: async () => {
+  fetchProjects: async (username = null) => {
     try {
       set({ loading: true });
 
-      const res = await fetch(`${BASE}/projects`);
-      const data = await res.json();
+      const endpoint = username
+        ? `${BASE}/projects/${username}`
+        : `${BASE}/projects`;
 
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      console.log("Fetched projects:", username);
       set({
         projects: data.projects || [],
         loading: false,

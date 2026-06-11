@@ -13,6 +13,9 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const skills = await prisma.skill.findMany({
+      where: {
+        userId: 1,
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -74,6 +77,44 @@ router.post(
     }
   }
 );
+
+
+
+/* -------------------------------------------------------------------------- */
+/*                         GET SKILLS BY USERNAME                             */
+/* -------------------------------------------------------------------------- */
+
+router.get("/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const skills = await prisma.skill.findMany({
+      where: {
+        user: {
+          username: {
+        equals: username,
+        mode: 'insensitive',
+      },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      skills,
+    });
+  } catch (error) {
+    console.error("GET USER SKILLS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                DELETE SKILL                                */

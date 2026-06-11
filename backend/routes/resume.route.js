@@ -31,6 +31,46 @@ router.get("/download", async (req, res) => {
   }
 });
 
+
+/* -------------------------------------------------------------------------- */
+/*                      GET RESUME BY USERNAME                                */
+/* -------------------------------------------------------------------------- */
+
+router.get("/:username/download", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const resume = await prisma.resume.findFirst({
+      where: {
+        user: {
+          username: {
+            equals: username,
+            mode: 'insensitive',
+          },
+        },
+      },
+    });
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found",
+      });
+    }
+
+    return res.redirect(resume.fileUrl);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch resume",
+    });
+  }
+});
+
+
+
 router.post(
   "/upload",
   resumeUpload.single("resume"),

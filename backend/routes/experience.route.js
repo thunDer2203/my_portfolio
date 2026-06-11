@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
         startDate: "desc",
       },
     });
-    console.log(experiences);
+    // console.log(experiences);
     res.status(200).json({
       success: true,
       experiences,
@@ -63,6 +63,43 @@ router.post("/", protectRoute, async (req, res) => {
     });
   } catch (error) {
     console.error("CREATE EXPERIENCE ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/*                     GET EXPERIENCE BY USERNAME                             */
+/* -------------------------------------------------------------------------- */
+
+router.get("/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const experiences = await prisma.experience.findMany({
+      where: {
+        user: {
+          username: {
+        equals: username,
+        mode: 'insensitive',
+      },
+        },
+      },
+      orderBy: {
+        startDate: "desc",
+      },
+    });
+
+    console.log("FETCH EXPERIENCE:", username, experiences);
+    res.status(200).json({
+      success: true,
+      experiences,
+    });
+  } catch (error) {
+    console.error("GET USER EXPERIENCE ERROR:", error);
 
     res.status(500).json({
       success: false,

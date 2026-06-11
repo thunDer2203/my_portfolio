@@ -11,8 +11,9 @@ import skillRoutes from "./routes/skill.route.js";
 import contactRoutes from "./routes/contact.route.js";
 import experienceRoutes from "./routes/experience.route.js";
 import socialRoutes from "./routes/social.route.js";
-import heroRoutes from "./routes/hero.route.js";
+// import heroRoutes from "./routes/hero.route.js";
 import aboutRoutes from "./routes/about.route.js";
+import portfolioRoutes from "./routes/portfolio.route.js";
 
 
 const app = express();
@@ -55,10 +56,10 @@ app.use("/api/contact", contactRoutes);
 
 app.use("/api/resume", resumeRoutes);
 
-app.use("/api/hero", heroRoutes);
 
 app.use("/api/about", aboutRoutes);
 
+app.use("/api/users", portfolioRoutes);
 
 
 

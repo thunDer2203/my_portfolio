@@ -42,7 +42,7 @@ router.get("/check", async (req, res) => {
 
     // Refresh token
     generateToken(user.id, res);
-
+    // console.log("Session valid for user:", user.email);
     res.status(200).json({
       success: true,
       message: "Authenticated",
@@ -51,6 +51,7 @@ router.get("/check", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        username: user.username,
       },
     });
   } catch (error) {
@@ -156,7 +157,7 @@ router.post("/register", async (req, res) => {
         title: newUser.title,
         role: newUser.role,
       },
-      portfolioUrl: `/${newUser.username}`,
+      portfolioUrl: `${process.env.FRONTEND_URL}/${newUser.username}`,
     });
   } catch (error) {
     console.error("REGISTER ERROR:", error);
@@ -216,6 +217,7 @@ router.post("/login", async (req, res) => {
     /* ------------------------------ Generate JWT ----------------------------- */
 
     generateToken(user.id, res);
+    // console.log("User logged in:", user.email);
 
     /* -------------------------------- Response -------------------------------- */
 
@@ -227,6 +229,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        username: user.username,
       },
     });
   } catch (error) {

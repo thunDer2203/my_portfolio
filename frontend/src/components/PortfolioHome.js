@@ -7,7 +7,6 @@ import { useExperienceStore } from "../store/experienceStore";
 import { useSocialStore } from "../store/socialStore";
 import { useAboutStore } from "../store/aboutStore";
 
-/* ─── tiny hook: fires when element enters viewport ─── */
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
@@ -58,6 +57,7 @@ function SkillBar({ skill, index, inView }) {
       style={{ animationDelay: `${index * 80}ms`, opacity: inView ? 1 : 0 }}
     >
       <div className="skill-meta">
+        <img className="skill-icon w-10 h-8" src={skill.icon} alt="" />
         <span className="skill-name">{skill.name}</span>
         <span className="skill-cat">{skill.category}</span>
         <span className="skill-lvl">{skill.level || "?"}/10</span>
@@ -77,6 +77,7 @@ function SkillBar({ skill, index, inView }) {
 
 /* ─── Project card ─── */
 function ProjectCard({ project, index }) {
+  console.log("Rendering project:", project);
   const [ref, inView] = useInView(0.1);
   return (
     <div
@@ -121,16 +122,7 @@ function ProjectCard({ project, index }) {
         </a>
         
       )}
-      {project.githubUrl && (
-        <a
-          href={project.githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="card-link"
-        >
-          View github →
-        </a>
-      )}
+  
       </div>
     </div>
   );
@@ -161,7 +153,7 @@ function ExpItem({ exp, index }) {
 }
 
 /* ═══════════════════════════════════════════ MAIN ══ */
-export default function PortfolioHome({ onReturn }) {
+export default function PortfolioHome({ onReturn, username }) {
   const about = useAboutStore((s) => s.about);
   const skills = useSkillStore((s) => s.skills);
   const projects = useProjectStore((s) => s.projects);
@@ -742,7 +734,7 @@ export default function PortfolioHome({ onReturn }) {
       <div className="pf-root">
         {/* NAV */}
         <nav className="nav">
-          <span className="nav-logo">SHUBHAM.OS</span>
+          <span className="nav-logo">{username || "SHUBHAM"}.OS</span>
           <button className="nav-btn" onClick={onReturn}>
             ← TERMINAL
           </button>
@@ -759,7 +751,7 @@ export default function PortfolioHome({ onReturn }) {
               className="hero-name"
               style={{ transform: `translate(${px * 0.3}px, ${py * 0.2}px)` }}
             >
-              <GlitchText text="SHUBHAM" />
+              <GlitchText text={username || "SHUBHAM"} />
               <br />
               <span className="hero-name-accent" style={{ fontSize: "0.55em", fontWeight: 400, letterSpacing: ".02em" }}>
                 {about?.heading || "Building the web, one commit at a time."}

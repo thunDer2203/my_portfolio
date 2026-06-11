@@ -28,6 +28,40 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+/* -------------------------------------------------------------------------- */
+/*                         GET SOCIALS BY USERNAME                            */
+/* -------------------------------------------------------------------------- */
+
+router.get("/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const socials = await prisma.socialLink.findMany({
+      where: {
+        user: {
+         username: {
+        equals: username,
+        mode: 'insensitive',
+      },
+        },
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      socials,
+    });
+  } catch (error) {
+    console.error("GET USER SOCIALS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
 /* -------------------------------------------------------------------------- */
 /*                             CREATE SOCIAL LINK                             */
 /* -------------------------------------------------------------------------- */

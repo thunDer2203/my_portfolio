@@ -6,11 +6,15 @@ export const useSkillStore = create((set) => ({
   skills: [],
   loading: false,
 
-  fetchSkills: async () => {
+  fetchSkills: async (username = null) => {
     try {
       set({ loading: true });
 
-      const res = await fetch(`${BASE}/skills`);
+      const endpoint = username
+        ? `${BASE}/skills/${username}`
+        : `${BASE}/skills`;
+
+      const res = await fetch(endpoint);
       const data = await res.json();
 
       set({

@@ -31,18 +31,25 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------------------- */
-/*                              GET SINGLE PROJECT                            */
-/* -------------------------------------------------------------------------- */
+// /* -------------------------------------------------------------------------- */
+// /*                              GET PROJECT by username                       */
+// /* -------------------------------------------------------------------------- */
 
-router.get("/:slug", async (req, res) => {
+router.get("/:username", async (req, res) => {
   try {
-    const project = await prisma.project.findUnique({
+    const { username } = req.params;
+    // console.log("FETCH PROJECT:", username);
+    const project = await prisma.project.findMany({
       where: {
-        slug: req.params.slug,
+        user: {
+          username: {
+        equals: username,
+        mode: 'insensitive',
+      },
+        },
       },
     });
-
+    // console.log("FETCH PROJECT:", username, project);
     if (!project) {
       return res.status(404).json({
         success: false,
@@ -52,7 +59,7 @@ router.get("/:slug", async (req, res) => {
 
     res.status(200).json({
       success: true,
-      project,
+      projects,
     });
   } catch (error) {
     console.error("GET PROJECT ERROR:", error);
