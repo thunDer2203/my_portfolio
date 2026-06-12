@@ -37,32 +37,50 @@ router.get("/", async (req, res) => {
 
 router.post("/", protectRoute, async (req, res) => {
   try {
-    const {
-      company,
-      role,
-      description,
-      startDate,
-      endDate,
-      currentlyWorking,
-    } = req.body;
+    const { experiences } = req.body;
 
-    const experience = await prisma.experience.create({
-      data: {
-        company,
-        role,
-        description,
-        startDate: new Date(startDate),
-        endDate: endDate ? new Date(endDate) : null,
-        currentlyWorking,
+    if (!Array.isArray(experiences)) {
+      return res.status(400).json({
+        success: false,
+        message: "experiences must be an array",
+      });
+    }
+
+    const userId = req.user.id;
+
+    // Remove existing experiences for this user
+    await prisma.experience.deleteMany({
+      where: {
+        userId,
       },
     });
 
+    // Create new experiences
+    const createdExperiences =
+      await prisma.experience.createMany({
+        data: experiences.map((exp) => ({
+          company: exp.company,
+          role: exp.role,
+          description: exp.description || null,
+          startDate: new Date(exp.startDate),
+          endDate: exp.endDate
+            ? new Date(exp.endDate)
+            : null,
+          currentlyWorking:
+            exp.currentlyWorking || false,
+          userId,
+        })),
+      });
+
     res.status(201).json({
       success: true,
-      experience,
+      count: createdExperiences.count,
     });
   } catch (error) {
-    console.error("CREATE EXPERIENCE ERROR:", error);
+    console.error(
+      "CREATE EXPERIENCES ERROR:",
+      error
+    );
 
     res.status(500).json({
       success: false,
@@ -70,7 +88,6 @@ router.post("/", protectRoute, async (req, res) => {
     });
   }
 });
-
 /* -------------------------------------------------------------------------- */
 /*                     GET EXPERIENCE BY USERNAME                             */
 /* -------------------------------------------------------------------------- */

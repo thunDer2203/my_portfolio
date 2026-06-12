@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 
-export default function DashboardPage({ onReturn }) {
+export default function DashboardPage() {
+  const router = useRouter();
+
   const { user, logout } = useAuthStore();
 
   const sections = [
@@ -27,21 +30,6 @@ export default function DashboardPage({ onReturn }) {
       key: "experience",
     },
     {
-      title: "Education",
-      description: "Manage education history",
-      key: "education",
-    },
-    {
-      title: "Certificates",
-      description: "Add certifications",
-      key: "certificates",
-    },
-    {
-      title: "Achievements",
-      description: "Show your achievements",
-      key: "achievements",
-    },
-    {
       title: "Social Links",
       description: "Connect your socials",
       key: "socials",
@@ -55,7 +43,7 @@ export default function DashboardPage({ onReturn }) {
 
   const handleLogout = async () => {
     await logout();
-    onReturn?.();
+    router.push("/");
   };
 
   return (
@@ -74,23 +62,24 @@ export default function DashboardPage({ onReturn }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex gap-3">
-  <button
-    onClick={() => {
-      window.open(`/${user?.username}`, "_blank");
-    }}
-    className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/10 transition cursor-pointer"
-  >
-    View Portfolio
-  </button>
+            <button
+              onClick={() =>
+                window.open(
+                  `/${user?.username}`,
+                  "_blank"
+                )
+              }
+              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/10 transition cursor-pointer"
+            >
+              View Portfolio
+            </button>
 
-  <button
-    onClick={onReturn}
-    className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/10 transition cursor-pointer"
-  >
-    Open Terminal
-  </button>
-</div>
+            <button
+              onClick={() => router.push(`/${user?.username}` )}
+              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/10 transition cursor-pointer"
+            >
+              Open Terminal
+            </button>
 
             <button
               onClick={handleLogout}
@@ -111,17 +100,23 @@ export default function DashboardPage({ onReturn }) {
 
           <div className="grid md:grid-cols-3 gap-4 mt-6">
             <div>
-              <p className="text-white/50 text-sm">Name</p>
+              <p className="text-white/50 text-sm">
+                Name
+              </p>
               <p>{user?.name}</p>
             </div>
 
             <div>
-              <p className="text-white/50 text-sm">Username</p>
+              <p className="text-white/50 text-sm">
+                Username
+              </p>
               <p>{user?.username}</p>
             </div>
 
             <div>
-              <p className="text-white/50 text-sm">Email</p>
+              <p className="text-white/50 text-sm">
+                Email
+              </p>
               <p>{user?.email}</p>
             </div>
           </div>
@@ -159,7 +154,12 @@ export default function DashboardPage({ onReturn }) {
               </p>
 
               <button
-                className="mt-5 w-full py-2 rounded-lg bg-white text-black font-medium hover:bg-white/90 transition"
+                onClick={() =>
+                  router.push(
+                    `/dashboard/${section.key}`
+                  )
+                }
+                className="mt-5 w-full py-2 rounded-lg bg-white text-black font-medium hover:bg-white/90 transition cursor-pointer"
               >
                 Manage
               </button>

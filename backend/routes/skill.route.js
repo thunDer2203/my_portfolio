@@ -38,47 +38,59 @@ router.get("/", async (req, res) => {
 /* -------------------------------------------------------------------------- */
 /*                                CREATE SKILL                                */
 /* -------------------------------------------------------------------------- */
+//need to make an option in frontend to choose from added icons or upload new one
+router.post("/", protectRoute, async (req, res) => {
+  try {
+    const { skills } = req.body;
 
-router.post(
-  "/",
-  upload.single("image"),
-  async (req, res) => {
-      try {
-          const {
-              name,
-              description,
-              category,
-              level,
-            } = req.body;
-            
-            const skill = await prisma.skill.create({
-                data: {
-                    name,
-          description,
-          category,
-          level: Number(level),
-
-          icon: req.file?.path || null,
-        },
-    });
-    
-    res.status(201).json({
-        success: true,
-        skill,
-    });
-    
-    } catch (error) {
-      console.error("Error in skill section",error);
-
-      res.status(500).json({
+    if (!Array.isArray(skills)) {
+      return res.status(400).json({
         success: false,
-        message: error.message,
+        message: "skills must be an array",
       });
     }
+
+    const userId = req.user.id;
+
+    // Remove existing skills
+    await prisma.skill.deleteMany({
+      where: {
+        userId,
+      },
+    });
+
+    // Create new skills
+    const createdSkills =
+      await prisma.skill.createMany({
+        data: skills.map((skill) => ({
+          name: skill.name,
+          description:
+            skill.description || null,
+          category: skill.category,
+          level: skill.level
+            ? Number(skill.level)
+            : null,
+          icon: skill.icon || null,
+          userId,
+        })),
+      });
+
+    res.status(201).json({
+      success: true,
+      count: createdSkills.count,
+    });
+  } catch (error) {
+    console.error(
+      "CREATE SKILLS ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
-);
-
-
+});
 
 /* -------------------------------------------------------------------------- */
 /*                         GET SKILLS BY USERNAME                             */

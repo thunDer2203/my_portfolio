@@ -1,5 +1,6 @@
   "use client";
 
+import { useRouter } from "next/navigation";
   import { useEffect, useRef, useState } from "react";
   import PortfolioHome from "./PortfolioHome";
   import { useSkillStore } from "../store/skillStore";
@@ -8,8 +9,6 @@
   import { useSocialStore } from "../store/socialStore";
   import { useAboutStore } from "../store/aboutStore";
   import { useAuthStore } from "../store/authStore";
-  import RegisterPage from "./Register";
-  import DashboardPage from "./DashBoard";
   import { usePortfolioStore } from "../store/portfolioStore";
 
   export default function Hero() {
@@ -43,7 +42,7 @@ const terminalUser = username || "shubham";
     const [currentLine, setCurrentLine] = useState("");
     const [lineIndex, setLineIndex] = useState(0);
     const [charIndex, setCharIndex] = useState(0);
-    const [showDashboard, setShowDashboard] = useState(false);
+    // const [showDashboard, setShowDashboard] = useState(false);
     const [mounted, setMounted] = useState(false);
 
 
@@ -56,10 +55,11 @@ const terminalUser = username || "shubham";
   const socials = useSocialStore((s) => s.socials);
 
     const [showPortfolio, setShowPortfolio] = useState(false);
-    const [showRegister, setShowRegister] = useState(false);
+    // const [showRegister, setShowRegister] = useState(false);
 
     const bootComplete = lineIndex >= bootLines.length;
     const [command, setCommand] = useState("");
+    const router = useRouter();
 
     const inputRef = useRef(null);
     const bottomRef = useRef(null);
@@ -352,12 +352,12 @@ const terminalUser = username || "shubham";
   if(!mounted) return null;
     return (
       <>
-      {showDashboard && (<DashboardPage onReturn={() => setShowDashboard(false)}/>
-)}
+      {/* {showDashboard && (<DashboardPage onReturn={() => setShowDashboard(false)}/>
+)} */}
       {showPortfolio && <PortfolioHome onReturn={() => setShowPortfolio(false)} username={username} />}
-        {showRegister && (<RegisterPage onReturn={() => setShowRegister(false)}/>
-)}
-      {!showPortfolio  && !showRegister && !showDashboard && (<section className="relative min-h-screen bg-[#050505] overflow-hidden">
+        {/* {showRegister && (<RegisterPage onReturn={() => setShowRegister(false)}/>
+)} */}
+      {!showPortfolio && (<section className="relative min-h-screen bg-[#050505] overflow-hidden">
         {/* GRID */}
 
         <div
@@ -397,9 +397,9 @@ const terminalUser = username || "shubham";
   <button
   onClick={() => {
     if (user) {
-      setShowDashboard(true);
+      router.push("/dashboard");
     } else {
-      setShowRegister(true);
+      router.push("/register");
     }
   }}
   className="px-4 py-2 text-sm font-medium rounded-lg

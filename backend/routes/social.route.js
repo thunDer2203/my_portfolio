@@ -65,25 +65,44 @@ router.get("/:username", async (req, res) => {
 /* -------------------------------------------------------------------------- */
 /*                             CREATE SOCIAL LINK                             */
 /* -------------------------------------------------------------------------- */
-
-router.post("/", protectRoute,upload.single("icon"), async (req, res) => {
+router.post("/", protectRoute, async (req, res) => {
   try {
-    const { platform, url } = req.body;
+    const { socials } = req.body;
 
-    const social = await prisma.socialLink.create({
-      data: {
-        platform,
-        url,
-        icon: req.file?.path || null,
+    if (!Array.isArray(socials)) {
+      return res.status(400).json({
+        success: false,
+        message: "socials must be an array",
+      });
+    }
+
+    const userId = req.user.id;
+
+    await prisma.socialLink.deleteMany({
+      where: {
+        userId,
       },
     });
 
+    const createdSocials =
+      await prisma.socialLink.createMany({
+        data: socials.map((social) => ({
+          platform: social.platform,
+          url: social.url,
+          icon: social.icon || null,
+          userId,
+        })),
+      });
+
     res.status(201).json({
       success: true,
-      social,
+      count: createdSocials.count,
     });
   } catch (error) {
-    console.error("CREATE SOCIAL ERROR:", error);
+    console.error(
+      "CREATE SOCIALS ERROR:",
+      error
+    );
 
     res.status(500).json({
       success: false,

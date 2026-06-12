@@ -75,40 +75,55 @@ router.get("/:username", async (req, res) => {
 /*                               CREATE PROJECT                               */
 /* -------------------------------------------------------------------------- */
 
+
 router.post("/", protectRoute, async (req, res) => {
   try {
-    const {
-      title,
-      slug,
-      shortDescription,
-      longDescription,
-      image,
-      githubUrl,
-      liveUrl,
-      techStack,
-      featured,
-    } = req.body;
+    const { projects } = req.body;
 
-    const project = await prisma.project.create({
-      data: {
-        title,
-        slug,
-        shortDescription,
-        longDescription,
-        image,
-        githubUrl,
-        liveUrl,
-        techStack,
-        featured,
+    if (!Array.isArray(projects)) {
+      return res.status(400).json({
+        success: false,
+        message: "projects must be an array",
+      });
+    }
+
+    const userId = req.user.id;
+
+    // Remove old projects
+    await prisma.project.deleteMany({
+      where: {
+        userId,
       },
     });
 
+    // Create new projects
+    const createdProjects =
+      await prisma.project.createMany({
+        data: projects.map((project) => ({
+          title: project.title,
+          slug: project.slug,
+          shortDescription:
+            project.shortDescription,
+          longDescription:
+            project.longDescription || null,
+          image: project.image || null,
+          githubUrl: project.githubUrl || null,
+          liveUrl: project.liveUrl || null,
+          featured: project.featured || false,
+          techStack: project.techStack || [],
+          userId,
+        })),
+      });
+
     res.status(201).json({
       success: true,
-      project,
+      count: createdProjects.count,
     });
   } catch (error) {
-    console.error("CREATE PROJECT ERROR:", error);
+    console.error(
+      "CREATE PROJECTS ERROR:",
+      error
+    );
 
     res.status(500).json({
       success: false,
