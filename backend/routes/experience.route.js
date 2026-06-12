@@ -93,7 +93,7 @@ router.get("/:username", async (req, res) => {
       },
     });
 
-    console.log("FETCH EXPERIENCE:", username, experiences);
+    // console.log("FETCH EXPERIENCE:", username, experiences);
     res.status(200).json({
       success: true,
       experiences,

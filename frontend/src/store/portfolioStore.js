@@ -4,6 +4,7 @@ const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export const usePortfolioStore = create((set) => ({
   username: null,
+  user:null,
 
   setUsername: (username) =>
     set({
@@ -16,8 +17,11 @@ export const usePortfolioStore = create((set) => ({
         `${BASE}/users/${username}`
       );
       const data = await res.json();
+      console.log("User data:", data);
       if (data.user) {
-        set({ username });
+        set({ username,
+          user:data.user,
+         });
       }
       else {
         set({ username: null });

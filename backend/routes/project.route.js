@@ -59,7 +59,7 @@ router.get("/:username", async (req, res) => {
 
     res.status(200).json({
       success: true,
-      projects,
+      projects:project,
     });
   } catch (error) {
     console.error("GET PROJECT ERROR:", error);

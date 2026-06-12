@@ -19,7 +19,7 @@ router.get("/:username", async (req, res) => {
     if(user){
         return res.status(200).json({
             success: true,
-            data: user || null,
+            user: user || null,
           });
     }
     else{

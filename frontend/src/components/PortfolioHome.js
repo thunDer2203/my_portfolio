@@ -6,6 +6,7 @@ import { useProjectStore } from "../store/projectStore";
 import { useExperienceStore } from "../store/experienceStore";
 import { useSocialStore } from "../store/socialStore";
 import { useAboutStore } from "../store/aboutStore";
+import {usePortfolioStore} from "../store/portfolioStore";
 
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
@@ -159,6 +160,7 @@ export default function PortfolioHome({ onReturn, username }) {
   const projects = useProjectStore((s) => s.projects);
   const experience = useExperienceStore((s) => s.experience);
   const socials = useSocialStore((s) => s.socials);
+  const user= usePortfolioStore((s) => s.user);
 
   const [skillsRef, skillsInView] = useInView(0.05);
   const canvasRef = useRef(null);
@@ -751,7 +753,7 @@ export default function PortfolioHome({ onReturn, username }) {
               className="hero-name"
               style={{ transform: `translate(${px * 0.3}px, ${py * 0.2}px)` }}
             >
-              <GlitchText text={username || "SHUBHAM"} />
+              <GlitchText text={user?.name || "SHUBHAM"} />
               <br />
               <span className="hero-name-accent" style={{ fontSize: "0.55em", fontWeight: 400, letterSpacing: ".02em" }}>
                 {about?.heading || "Building the web, one commit at a time."}
