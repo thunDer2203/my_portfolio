@@ -12,7 +12,13 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const socials = await prisma.socialLink.findMany();
+    const socials = await prisma.socialLink.findMany(
+      {
+        where: {
+          userId: 1,
+        },
+      }
+    );
 
     res.status(200).json({
       success: true,
@@ -28,6 +34,29 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+
+router.get("/secure",protectRoute, async (req, res) => {
+  try {
+    const socials = await prisma.socialLink.findMany({
+      where:{
+        userId:req.user.id,
+      },
+  });
+
+    res.status(200).json({
+      success: true,
+      socials,
+    });
+  } catch (error) {
+    console.error("GET SOCIALS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                         GET SOCIALS BY USERNAME                            */

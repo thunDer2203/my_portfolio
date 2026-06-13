@@ -9,6 +9,7 @@ import { useExperienceStore } from "../store/experienceStore";
 import { useSocialStore } from "../store/socialStore";
 import { useAuthStore } from "../store/authStore";
 import { usePortfolioStore } from "../store/portfolioStore";
+import { useResumeStore } from "../store/resumeStore";
 
 export default function PortfolioProvider({
   children,
@@ -19,6 +20,7 @@ export default function PortfolioProvider({
 
   useEffect(() => {
     useAuthStore.getState().checkAuth();
+    // useResumeStore.getState().securedFetchResume();
 
     useAboutStore
       .getState()

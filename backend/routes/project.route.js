@@ -12,11 +12,40 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
+      where:{
+        userId: 1,
+      },
       orderBy: {
         createdAt: "desc",
       },
     });
 
+    res.status(200).json({
+      success: true,
+      projects,
+    });
+  } catch (error) {
+    console.error("GET PROJECTS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
+
+router.get("/secure", protectRoute, async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      where:{
+        userId: req.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    // console.log("SECURE PROJECTS:", projects);
     res.status(200).json({
       success: true,
       projects,
@@ -136,26 +165,5 @@ router.post("/", protectRoute, async (req, res) => {
 /*                               DELETE PROJECT                               */
 /* -------------------------------------------------------------------------- */
 
-router.delete("/:id", protectRoute, async (req, res) => {
-  try {
-    await prisma.project.delete({
-      where: {
-        id: Number(req.params.id),
-      },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Project deleted",
-    });
-  } catch (error) {
-    console.error("DELETE PROJECT ERROR:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-});
 
 export default router;

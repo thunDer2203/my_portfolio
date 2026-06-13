@@ -30,7 +30,7 @@ export default function DashboardPage() {
       key: "experience",
     },
     {
-      title: "Social Links",
+      title: "Socials",
       description: "Connect your socials",
       key: "socials",
     },

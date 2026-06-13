@@ -35,6 +35,31 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+router.get("/secure", protectRoute, async (req, res) => {
+  try {
+    const skills = await prisma.skill.findMany({
+      where: {
+        userId: req.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      skills,
+    });
+  } catch (error) {
+    console.error("GET SKILLS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
 /* -------------------------------------------------------------------------- */
 /*                                CREATE SKILL                                */
 /* -------------------------------------------------------------------------- */

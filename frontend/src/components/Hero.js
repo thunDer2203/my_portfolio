@@ -193,10 +193,11 @@ const terminalUser = username || "shubham";
         "",
       ]);
 
-      window.open(
-        `${process.env.NEXT_PUBLIC_API_URL}/resume/download`,
-        "_blank"
-      );
+       const resumeUrl = terminalUser
+    ? `${process.env.NEXT_PUBLIC_API_URL}/resume/${terminalUser}/download`
+    : `${process.env.NEXT_PUBLIC_API_URL}/resume/download`;
+
+  window.open(resumeUrl, "_blank");
 
       setCommand("");
       return;

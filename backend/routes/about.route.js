@@ -1,10 +1,34 @@
 import express from "express";
 import prisma from "../lib/db.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 
 /* ---------------- GET ABOUT BY USERNAME ---------------- */
+
+
+
+router.get("/secure", protectRoute, async (req, res) => {
+  try {
+    const about = await prisma.about.findFirst({
+      where:{
+        userId: req.user.id,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      about,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch about section",
+    });
+  }
+});
+
 
 router.get("/:username", async (req, res) => {
   try {
@@ -71,43 +95,39 @@ router.get("/", async (req, res) => {
 
 /* ---------------- CREATE / UPDATE ABOUT ---------------- */
 
-router.post("/", async (req, res) => {
+router.post("/", protectRoute, async (req, res) => {
   try {
     const { heading, content } = req.body;
 
-    const existing = await prisma.about.findFirst();
+    const userId = req.user.id;
 
-    let about;
+    await prisma.about.deleteMany({
+      where: {
+        userId,
+      },
+    });
 
-    if (existing) {
-      about = await prisma.about.update({
-        where: {
-          id: existing.id,
-        },
-        data: {
-          heading,
-          content,
-        },
-      });
-    } else {
-      about = await prisma.about.create({
-        data: {
-          heading,
-          content,
-        },
-      });
-    }
+    const about = await prisma.about.create({
+      data: {
+        heading,
+        content,
+        userId,
+      },
+    });
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       about,
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "CREATE ABOUT ERROR:",
+      error
+    );
 
     res.status(500).json({
       success: false,
-      message: "Failed to save about section",
+      message: error.message,
     });
   }
 });

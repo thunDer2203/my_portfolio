@@ -6,6 +6,26 @@ export const useProjectStore = create((set) => ({
   projects: [],
   loading: false,
 
+  securedFetchProjects: async () => {
+    try {
+      
+      const res =await fetch(`${BASE}/projects/secure`, {
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Request failed"
+        );
+      }
+      
+    return data.projects || [];
+
+    } catch (error) {
+      console.error(error);
+    }},
+
+
   fetchProjects: async (username = null) => {
     try {
       set({ loading: true });
@@ -16,7 +36,7 @@ export const useProjectStore = create((set) => ({
 
       const res = await fetch(endpoint);
       const data = await res.json();
-      console.log("Fetched projects:", username);
+      // console.log("Fetched projects:", username);
       set({
         projects: data.projects || [],
         loading: false,

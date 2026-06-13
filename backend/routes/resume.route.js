@@ -1,6 +1,7 @@
 import { resumeUpload } from "../middleware/resumeUpload.js";
 import express from "express";
 import prisma from "../lib/db.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 
 const router = express.Router();
@@ -11,7 +12,13 @@ const router = express.Router();
 
 router.get("/download", async (req, res) => {
   try {
-    const resume = await prisma.resume.findFirst();
+    const resume = await prisma.resume.findFirst(
+      {
+        where:{
+          userId: 1,
+        },
+      }
+    );
 
     if (!resume) {
       return res.status(404).json({
@@ -69,6 +76,41 @@ router.get("/:username/download", async (req, res) => {
   }
 });
 
+
+router.get(
+  "/",
+  protectRoute,
+  async (req, res) => {
+    try {
+      const resume =
+        await prisma.resume.findFirst({
+          where: {
+            userId: req.user.id,
+          },
+        });
+
+      if (!resume) {
+        return res.status(404).json({
+          success: false,
+          message: "Resume not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        resume,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message:
+          "Failed to fetch resume",
+      });
+    }
+  }
+);
 
 
 router.post(

@@ -12,6 +12,36 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const experiences = await prisma.experience.findMany({
+      where:{
+        userId: 1,  
+      },
+      orderBy: {
+        startDate: "desc",
+      },
+    });
+    // console.log(experiences);
+    res.status(200).json({
+      success: true,
+      experiences,
+    });
+  } catch (error) {
+    console.error("GET EXPERIENCE ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
+
+
+router.get("/secure", protectRoute, async (req, res) => {
+  try {
+    const experiences = await prisma.experience.findMany({
+      where:{
+        userId: req.user.id,  
+      },
       orderBy: {
         startDate: "desc",
       },

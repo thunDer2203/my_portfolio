@@ -6,6 +6,26 @@ export const useAboutStore = create((set) => ({
   about: null,
   loading: false,
 
+  securedFetchAbout: async () => {
+    try {
+      
+      const res =await fetch(`${BASE}/about/secure`, {
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Request failed"
+        );
+      }
+      console.log("SECURE ABOUT:", data.about);
+    return data.about || [];
+
+    } catch (error) {
+      console.error(error);
+    }},
+
+
   fetchAbout: async (username = null) => {
     try {
       set({ loading: true });

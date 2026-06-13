@@ -359,7 +359,6 @@ export default function PortfolioHome({ onReturn, username }) {
         }
         .hero-name-accent { color: #4ade80; }
         .hero-sub {
-          max-width: 520px;
           font-size: 1.15rem;
           color: rgba(232,234,240,.55);
           line-height: 1.7;
@@ -761,11 +760,11 @@ export default function PortfolioHome({ onReturn, username }) {
               </span>
             </h1>
 
-            <p className="hero-sub">
+            {/* <p className="hero-sub">
               {about?.content
-                ? about.content.split(".")[0] + "."
+                ? about.content
                 : "Crafting scalable web applications, backend systems, and developer tools that ship."}
-            </p>
+            </p> */}
 
             <div className="hero-ctas">
               <a href="#projects" className="cta-primary">View Projects</a>

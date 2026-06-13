@@ -6,6 +6,26 @@ export const useExperienceStore = create((set) => ({
   experience: [],
   loading: false,
 
+  securedFetchExperiences: async () => {
+    try {
+      
+      const res =await fetch(`${BASE}/experience/secure`, {
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Request failed"
+        );
+      }
+      
+    return data.experiences || [];
+
+    } catch (error) {
+      console.error(error);
+    }},
+
+
   fetchExperience: async (username = null) => {
     try {
       set({ loading: true });
@@ -17,7 +37,7 @@ export const useExperienceStore = create((set) => ({
       const res = await fetch(endpoint);
       const data = await res.json();
 
-      console.log(data.experiences);
+      // console.log(data.experiences);
 
       set({
         experience: data.experiences || [],

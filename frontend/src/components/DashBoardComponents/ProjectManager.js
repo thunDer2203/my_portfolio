@@ -1,264 +1,225 @@
 "use client";
+import { useState,useEffect } from "react";
+import { useProjectStore } from "@/store/projectStore";
 
-import { useState } from "react";
+function slugify(str) {
+  return str.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
+
+const emptyProject = () => ({
+  title: "", slug: "", shortDescription: "", longDescription: "",
+  githubUrl: "", liveUrl: "", image: "", techStack: [],
+  featured: false, _slugEdited: false,
+});
 
 export default function ProjectsManager() {
-  const [projects, setProjects] = useState([
-    {
-      title: "",
-      slug: "",
-      shortDescription: "",
-      longDescription: "",
-      githubUrl: "",
-      liveUrl: "",
-      image: "",
-      techStack: "",
-      featured: false,
-    },
-  ]);
+  const [projects, setProjects] = useState([emptyProject()]);
+  const [saved, setSaved] = useState(false);
+  const { securedFetchProjects } =useProjectStore();
 
-  const addProject = () => {
-    setProjects([
-      ...projects,
-      {
-        title: "",
-        slug: "",
-        shortDescription: "",
-        longDescription: "",
-        githubUrl: "",
-        liveUrl: "",
-        image: "",
-        techStack: "",
-        featured: false,
-      },
-    ]);
-  };
-
-  const removeProject = (index) => {
-    setProjects(
-      projects.filter((_, i) => i !== index)
-    );
-  };
-
-  const updateProject = (
-    index,
-    field,
-    value
-  ) => {
-    const updated = [...projects];
-    updated[index][field] = value;
-    setProjects(updated);
-  };
-
-  const handleSave = async () => {
+useEffect(() => {
+  const loadProjects = async () => {
     try {
-      const payload = projects.map((project) => ({
-        ...project,
-        techStack: project.techStack
-          .split(",")
-          .map((tech) => tech.trim())
-          .filter(Boolean),
-      }));
+      const fetchedProjects =await securedFetchProjects();
+      console.log("Fetched projects:", fetchedProjects);
+      if (fetchedProjects.length > 0) {
+        setProjects(
+          fetchedProjects.map((project) => ({
+            slug: project.slug || "",
+            id: project.id,
+            title: project.title || "",
+            shortDescription:
+              project.shortDescription || "",
+              longDescription:project.longDescription || "",
+            techStack:
+              project.techStack || [],
+            githubUrl:
+              project.githubUrl || "",
+            liveUrl:
+              project.liveUrl || "",
+            imageUrl:
+              project.imageUrl || "",
+            featured:
+              project.featured || false,
+          }))
+        );
+      }
 
-      console.log(payload);
-
-      // await fetch("/projects", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   credentials: "include",
-      //   body: JSON.stringify({
-      //     projects: payload,
-      //   }),
-      // });
-
-      alert("Projects saved");
+      console.log("Projects loaded successfully",projects);
     } catch (error) {
       console.error(error);
-      alert("Failed to save projects");
     }
   };
 
+  loadProjects();
+}, []);
+
+  const update = (i, field, value) => {
+    const updated = [...projects];
+    updated[i] = { ...updated[i], [field]: value };
+    if (field === "title" && !updated[i]._slugEdited) {
+      updated[i].slug = slugify(value);
+    }
+    if (field === "slug") updated[i]._slugEdited = true;
+    setProjects(updated);
+  };
+
+  const addTag = (i) => {
+    const val = (projects[i].techInput || "").trim().replace(/,$/, "").trim();
+    if (val && !projects[i].techStack.includes(val)) {
+      const updated = [...projects];
+      updated[i].techStack = [...updated[i].techStack, val];
+      updated[i].techInput = "";
+      setProjects(updated);
+    }
+  };
+
+  const removeTag = (i, ti) => {
+    const updated = [...projects];
+    updated[i].techStack = updated[i].techStack.filter((_, idx) => idx !== ti);
+    setProjects(updated);
+  };
+
+  const addProject = () => setProjects([...projects, emptyProject()]);
+  const removeProject = (i) => setProjects(projects.filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    try {
+      const payload = projects.map(({ techInput, _slugEdited, ...p }) => p);
+      console.log(payload);
+      // await fetch("/projects", { method: "POST", ... });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const inp = { background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 8, color: "#e0e0e0", fontSize: 13, padding: "10px 12px", outline: "none", fontFamily: "inherit", width: "100%" };
+  const lbl = { fontSize: 11, fontWeight: 500, color: "#444", textTransform: "uppercase", letterSpacing: "0.06em" };
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">
-          Projects
-        </h2>
+    <div style={{ background: "#0a0a0a", minHeight: "100vh", padding: "2rem", fontFamily: "system-ui, sans-serif" }}>
 
-        <p className="text-white/60 mt-1">
-          Add all your portfolio projects.
-        </p>
-      </div>
+      {/* Header */}
+      <span style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.07em", background: "#161616", border: "1px solid #222", borderRadius: 20, padding: "4px 10px", display: "inline-block", marginBottom: 12 }}>Portfolio section</span>
+      <p style={{ fontSize: 24, fontWeight: 600, color: "#f0f0f0", letterSpacing: "-0.02em", marginBottom: 4 }}>Projects</p>
+      <p style={{ fontSize: 14, color: "#555", marginBottom: "2rem" }}>Add your portfolio projects — these show up on your main page</p>
 
-      {projects.map((project, index) => (
-        <div
-          key={index}
-          className="bg-[#0B0B0B] border border-white/10 rounded-2xl p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold">
-              Project #{index + 1}
-            </h3>
+      {projects.map((p, i) => (
+        <div key={i} style={{ background: "#111", border: "1px solid #222", borderRadius: 16, overflow: "hidden", marginBottom: "1rem" }}>
 
+          {/* Card Header */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem 1.25rem", borderBottom: "1px solid #1a1a1a" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 8, background: "#1a1a1a", border: "1px solid #2a2a2a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: "#555" }}>{i + 1}</div>
+              <span style={{ fontSize: 14, fontWeight: 500, color: "#888" }}>{p.title || "Untitled project"}</span>
+              {p.featured && <span style={{ fontSize: 10, fontWeight: 600, color: "#a06020", background: "#1e1508", border: "1px solid #3a2510", borderRadius: 20, padding: "3px 8px", textTransform: "uppercase" }}>★ Featured</span>}
+            </div>
             {projects.length > 1 && (
-              <button
-                onClick={() =>
-                  removeProject(index)
-                }
-                className="text-red-400 hover:text-red-300"
-              >
-                Remove
-              </button>
+              <button onClick={() => removeProject(i)} style={{ fontSize: 12, color: "#5a2020", background: "#1a0f0f", border: "1px solid #2e1515", borderRadius: 8, padding: "5px 10px", cursor: "pointer" }}>Remove</button>
             )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Project Title"
-              value={project.title}
-              onChange={(e) =>
-                updateProject(
-                  index,
-                  "title",
-                  e.target.value
-                )
-              }
-              className="p-3 rounded-lg bg-black border border-white/10"
-            />
+          {/* Card Body */}
+          <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: 16 }}>
 
-            <input
-              type="text"
-              placeholder="Slug"
-              value={project.slug}
-              onChange={(e) =>
-                updateProject(
-                  index,
-                  "slug",
-                  e.target.value
-                )
-              }
-              className="p-3 rounded-lg bg-black border border-white/10"
-            />
+            {/* Title + Slug */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <span style={lbl}>Project title</span>
+                <input style={inp} type="text" placeholder="e.g. Finance Backend API" value={p.title} onChange={(e) => update(i, "title", e.target.value)} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <span style={lbl}>Slug</span>
+                <input style={inp} type="text" placeholder="Name to be Displayed" value={p.slug} onChange={(e) => update(i, "slug", e.target.value)} />
+              </div>
+            </div>
 
-            <input
-              type="text"
-              placeholder="Github URL"
-              value={project.githubUrl}
-              onChange={(e) =>
-                updateProject(
-                  index,
-                  "githubUrl",
-                  e.target.value
-                )
-              }
-              className="p-3 rounded-lg bg-black border border-white/10"
-            />
+            {/* URLs */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <span style={lbl}>GitHub URL</span>
+                <input style={inp} type="url" placeholder="https://github.com/..." value={p.githubUrl} onChange={(e) => update(i, "githubUrl", e.target.value)} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <span style={lbl}>Live URL</span>
+                <input style={inp} type="url" placeholder="https://..." value={p.liveUrl} onChange={(e) => update(i, "liveUrl", e.target.value)} />
+              </div>
+            </div>
 
-            <input
-              type="text"
-              placeholder="Live URL"
-              value={project.liveUrl}
-              onChange={(e) =>
-                updateProject(
-                  index,
-                  "liveUrl",
-                  e.target.value
-                )
-              }
-              className="p-3 rounded-lg bg-black border border-white/10"
-            />
+            {/* Short description */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={lbl}>Short description</span>
+                <span style={{ fontSize: 11, color: "#333" }}>{p.shortDescription.length} / 150</span>
+              </div>
+              <textarea rows={2} maxLength={150} placeholder="One-liner shown on project cards..." value={p.shortDescription} onChange={(e) => update(i, "shortDescription", e.target.value)}
+                style={{ ...inp, resize: "vertical", lineHeight: 1.6 }} />
+            </div>
+
+            {/* Long description */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={lbl}>Long description</span>
+                <span style={{ fontSize: 11, color: "#333" }}>{p.longDescription.length} / 800</span>
+              </div>
+              <textarea rows={4} maxLength={800} placeholder="Full project details, challenges, what you learned..." value={p.longDescription} onChange={(e) => update(i, "longDescription", e.target.value)}
+                style={{ ...inp, resize: "vertical", lineHeight: 1.6 }} />
+            </div>
+
+            {/* Image */}
+            {/* <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <span style={lbl}>Image URL</span>
+              <input style={inp} type="url" placeholder="https://... (screenshot or banner)" value={p.image} onChange={(e) => update(i, "image", e.target.value)} />
+            </div> */}
+
+            {/* Tech stack */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <span style={lbl}>Tech stack</span>
+              <input style={inp} type="text" placeholder="Type a technology and press Enter..." value={p.techInput}
+                onChange={(e) => update(i, "techInput", e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(i); } }} />
+              {p.techStack.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+                  {p.techStack.map((t, ti) => (
+                    <span key={ti} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#888", background: "#161616", border: "1px solid #222", borderRadius: 6, padding: "4px 8px" }}>
+                      {t}
+                      <button onClick={() => removeTag(i, ti)} style={{ color: "#444", background: "none", border: "none", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Featured toggle */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 8, padding: "12px 14px" }}>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 500, color: "#888", marginBottom: 2 }}>Featured project</p>
+                <span style={{ fontSize: 12, color: "#333" }}>Pinned to the top of your portfolio</span>
+              </div>
+              <div onClick={() => update(i, "featured", !p.featured)}
+                style={{ width: 40, height: 22, borderRadius: 11, background: p.featured ? "#e0e0e0" : "#2a2a2a", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+                <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#111", position: "absolute", top: 3, left: p.featured ? 21 : 3, transition: "left 0.2s" }} />
+              </div>
+            </div>
           </div>
 
-          <textarea
-            placeholder="Short Description"
-            value={project.shortDescription}
-            onChange={(e) =>
-              updateProject(
-                index,
-                "shortDescription",
-                e.target.value
-              )
-            }
-            className="w-full mt-4 p-3 rounded-lg bg-black border border-white/10"
-            rows={3}
-          />
-
-          <textarea
-            placeholder="Long Description"
-            value={project.longDescription}
-            onChange={(e) =>
-              updateProject(
-                index,
-                "longDescription",
-                e.target.value
-              )
-            }
-            className="w-full mt-4 p-3 rounded-lg bg-black border border-white/10"
-            rows={5}
-          />
-
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={project.image}
-            onChange={(e) =>
-              updateProject(
-                index,
-                "image",
-                e.target.value
-              )
-            }
-            className="w-full mt-4 p-3 rounded-lg bg-black border border-white/10"
-          />
-
-          <input
-            type="text"
-            placeholder="Tech Stack (React, Node.js, Prisma)"
-            value={project.techStack}
-            onChange={(e) =>
-              updateProject(
-                index,
-                "techStack",
-                e.target.value
-              )
-            }
-            className="w-full mt-4 p-3 rounded-lg bg-black border border-white/10"
-          />
-
-          <label className="flex items-center gap-3 mt-4">
-            <input
-              type="checkbox"
-              checked={project.featured}
-              onChange={(e) =>
-                updateProject(
-                  index,
-                  "featured",
-                  e.target.checked
-                )
-              }
-            />
-
-            <span>Featured Project</span>
-          </label>
+          {/* Footer strip */}
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "0.75rem 1.25rem", background: "#0d0d0d", borderTop: "1px solid #1a1a1a" }}>
+            <span style={{ fontSize: 12, color: "#2e2e2e" }}>{p.techStack.length} tech{p.techStack.length !== 1 ? "s" : ""} · {p.longDescription.length} chars</span>
+          </div>
         </div>
       ))}
 
-      <div className="flex gap-4">
-        <button
-          onClick={addProject}
-          className="px-5 py-3 rounded-lg border border-white/10 hover:bg-white/10 transition"
-        >
-          + Add Project
+      {/* Actions */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: "0.5rem" }}>
+        <button onClick={addProject} style={{ display: "flex", alignItems: "center", gap: 7, background: "transparent", border: "1px solid #222", borderRadius: 10, color: "#888", fontSize: 13, fontWeight: 500, padding: "10px 16px", cursor: "pointer", fontFamily: "inherit" }}>
+          + Add project
         </button>
-
-        <button
-          onClick={handleSave}
-          className="px-5 py-3 rounded-lg bg-white text-black font-medium"
-        >
-          Save All Projects
+        {saved && <span style={{ fontSize: 13, color: "#3a9e5f" }}>✓ Saved successfully</span>}
+        <button onClick={handleSave} style={{ marginLeft: "auto", background: "#f0f0f0", border: "none", borderRadius: 10, color: "#111", fontSize: 13, fontWeight: 600, padding: "10px 20px", cursor: "pointer", fontFamily: "inherit" }}>
+          Save all projects
         </button>
       </div>
     </div>
