@@ -465,50 +465,45 @@ export default function PortfolioHome({ onReturn, username }) {
         }
 
         /* ── ABOUT ── */
-        .about-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 5rem;
-          align-items: center;
-        }
-        @media(max-width:768px){ .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
-        .about-heading {
-          font-size: clamp(2.2rem, 5vw, 3.5rem);
-          font-weight: 800;
-          line-height: 1.1;
-          letter-spacing: -.02em;
-          margin-bottom: 1.5rem;
-        }
-        .about-text {
-          color: rgba(232,234,240,.6);
-          font-size: 1rem;
-          line-height: 1.85;
-        }
-        .about-right {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
-        }
-        .about-card {
-          border: 1px solid rgba(74,222,128,.15);
-          border-radius: 12px;
-          padding: 1.5rem;
-          background: rgba(74,222,128,.03);
-          transition: border-color .3s, background .3s, transform .3s;
-        }
-        .about-card:hover {
-          border-color: rgba(74,222,128,.4);
-          background: rgba(74,222,128,.07);
-          transform: translateY(-4px);
-        }
-        .about-card-icon { font-size: 1.5rem; margin-bottom: .75rem; }
-        .about-card-title {
-          font-size: .9rem; font-weight: 700; margin-bottom: .4rem;
-        }
-        .about-card-desc {
-          font-size: .78rem;
-          color: rgba(232,234,240,.45);
-          line-height: 1.6;
-        }
+     /* ── ABOUT ── */
+.about-full {
+  max-width: 100%;
+}
 
+.about-heading {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin-bottom: 2rem;
+}
+
+.about-text {
+  font-size: 1.15rem;
+  line-height: 2;
+  color: rgba(232,234,240,.75);
+  max-width: 100%;
+  background: rgba(74,222,128,.03);
+  border: 1px solid rgba(74,222,128,.1);
+  border-radius: 12px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-text::before {
+  content: '</>';
+  position: absolute;
+  bottom: -1.5rem;
+  right: 1.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 6rem;
+  font-weight: 800;
+  color: rgba(74,222,128,.04);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
         /* ── SKILLS ── */
         .skills-inner {
           display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
@@ -805,32 +800,16 @@ export default function PortfolioHome({ onReturn, username }) {
 
         {/* ── ABOUT ── */}
         {about && (
-          <section className="section" id="about">
-            <p className="section-label">About</p>
-            <div className="about-grid">
-              <div>
-                <h2 className="about-heading">
-                  {about.heading || "Who am I?"}
-                </h2>
-                <p className="about-text">{about.content}</p>
-              </div>
-              <div className="about-right">
-                {[
-                  { icon: "⚡", title: "Fast Delivery", desc: "Production-ready code, shipped on schedule." },
-                  { icon: "🔧", title: "Full Stack", desc: "From database schema to pixel-perfect UI." },
-                  { icon: "☁️", title: "Cloud Native", desc: "Scalable, containerised, cloud-first solutions." },
-                  { icon: "🤝", title: "Team Player", desc: "Clean code, clear docs, collaborative workflows." },
-                ].map((c) => (
-                  <div className="about-card" key={c.title}>
-                    <div className="about-card-icon">{c.icon}</div>
-                    <div className="about-card-title">{c.title}</div>
-                    <div className="about-card-desc">{c.desc}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+  <section className="section" id="about">
+    <p className="section-label">About</p>
+    <div className="about-full">
+      <h2 className="about-heading">
+        {about.heading || "Who am I?"}
+      </h2>
+      <p className="about-text">{about.content}</p>
+    </div>
+  </section>
+)}
 
         <hr className="divider" />
 
