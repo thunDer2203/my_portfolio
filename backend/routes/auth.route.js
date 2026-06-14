@@ -85,7 +85,7 @@ router.post("/register", async (req, res) => {
         message: "Name, username, email and password are required",
       });
     }
-    
+
     if(username.toLowerCase() === "secure"  || username.toLowerCase() === "secured"){
       return res.status(400).json({
         success: false,
@@ -271,7 +271,7 @@ router.post("/logout", (req, res) => {
     res.clearCookie("jwt", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
     });
 
     res.status(200).json({
