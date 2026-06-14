@@ -83,8 +83,6 @@ const handleSave = async () => {
       );
     }
 
-    await fetchSocials();
-
     setSaved(true);
 
     setTimeout(() => {

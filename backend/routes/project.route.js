@@ -9,30 +9,7 @@ const router = express.Router();
 /*                              GET ALL PROJECTS                              */
 /* -------------------------------------------------------------------------- */
 
-router.get("/", async (req, res) => {
-  try {
-    const projects = await prisma.project.findMany({
-      where:{
-        userId: 1,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
 
-    res.status(200).json({
-      success: true,
-      projects,
-    });
-  } catch (error) {
-    console.error("GET PROJECTS ERROR:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-});
 
 
 router.get("/secure", protectRoute, async (req, res) => {
@@ -100,6 +77,31 @@ router.get("/:username", async (req, res) => {
   }
 });
 
+
+router.get("/", async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      where:{
+        userId: 1,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      projects,
+    });
+  } catch (error) {
+    console.error("GET PROJECTS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
 /* -------------------------------------------------------------------------- */
 /*                               CREATE PROJECT                               */
 /* -------------------------------------------------------------------------- */

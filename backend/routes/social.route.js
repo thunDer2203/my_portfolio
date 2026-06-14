@@ -10,31 +10,6 @@ const router = express.Router();
 /*                             GET SOCIAL LINKS                               */
 /* -------------------------------------------------------------------------- */
 
-router.get("/", async (req, res) => {
-  try {
-    const socials = await prisma.socialLink.findMany(
-      {
-        where: {
-          userId: 1,
-        },
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      socials,
-    });
-  } catch (error) {
-    console.error("GET SOCIALS ERROR:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-});
-
-
 
 router.get("/secure",protectRoute, async (req, res) => {
   try {
@@ -57,10 +32,6 @@ router.get("/secure",protectRoute, async (req, res) => {
     });
   }
 });
-
-/* -------------------------------------------------------------------------- */
-/*                         GET SOCIALS BY USERNAME                            */
-/* -------------------------------------------------------------------------- */
 
 router.get("/:username", async (req, res) => {
   try {
@@ -90,6 +61,39 @@ router.get("/:username", async (req, res) => {
     });
   }
 });
+
+
+router.get("/", async (req, res) => {
+  try {
+    const socials = await prisma.socialLink.findMany(
+      {
+        where: {
+          userId: 1,
+        },
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      socials,
+    });
+  } catch (error) {
+    console.error("GET SOCIALS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
+
+
+
+/* -------------------------------------------------------------------------- */
+/*                         GET SOCIALS BY USERNAME                            */
+/* -------------------------------------------------------------------------- */
+
 
 /* -------------------------------------------------------------------------- */
 /*                             CREATE SOCIAL LINK                             */

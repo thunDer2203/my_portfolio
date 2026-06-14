@@ -21,12 +21,11 @@ useEffect(() => {
   const loadProjects = async () => {
     try {
       const fetchedProjects =await securedFetchProjects();
-      console.log("Fetched projects:", fetchedProjects);
+      // console.log("Fetched projects:", fetchedProjects);
       if (fetchedProjects.length > 0) {
         setProjects(
           fetchedProjects.map((project) => ({
             slug: project.slug || "",
-            id: project.id,
             title: project.title || "",
             shortDescription:
               project.shortDescription || "",
@@ -45,7 +44,7 @@ useEffect(() => {
         );
       }
 
-      console.log("Projects loaded successfully",projects);
+      // console.log("Projects loaded successfully",projects);
     } catch (error) {
       console.error(error);
     }
@@ -83,17 +82,34 @@ useEffect(() => {
   const addProject = () => setProjects([...projects, emptyProject()]);
   const removeProject = (i) => setProjects(projects.filter((_, idx) => idx !== i));
 
-  const handleSave = async () => {
-    try {
-      const payload = projects.map(({ techInput, _slugEdited, ...p }) => p);
-      console.log(payload);
-      // await fetch("/projects", { method: "POST", ... });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
-      console.error(err);
+ const handleSave = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/projects`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          projects,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message);
     }
-  };
+
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const inp = { background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 8, color: "#e0e0e0", fontSize: 13, padding: "10px 12px", outline: "none", fontFamily: "inherit", width: "100%" };
   const lbl = { fontSize: 11, fontWeight: 500, color: "#444", textTransform: "uppercase", letterSpacing: "0.06em" };

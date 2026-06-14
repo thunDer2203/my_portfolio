@@ -314,7 +314,7 @@ const terminalUser = username || "shubham";
         "",
         "Get in touch",
         "",
-        "Email: shubham@example.com",
+        "Email: shubham.hamirwasia03@gmail.com",
         "",
         'Use "resume" to download CV',
         "",
@@ -468,7 +468,7 @@ const terminalUser = username || "shubham";
 
                     <span>{command}</span>
 
-                    <span className="terminal-cursor ml-[1px]">
+                    <span className="terminal-cursor ">
                       █
                     </span>
                   </div>

@@ -52,7 +52,7 @@ const upload = async () => {
     }
 
     const res = await fetch(
-      `${BASE}/resume`,
+      `${BASE}/resume/upload`,
       {
         method: "POST",
         credentials: "include",

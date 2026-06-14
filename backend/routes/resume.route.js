@@ -10,73 +10,6 @@ const router = express.Router();
 /*                               GET RESUME                                */
 /* -------------------------------------------------------------------------- */
 
-router.get("/download", async (req, res) => {
-  try {
-    const resume = await prisma.resume.findFirst(
-      {
-        where:{
-          userId: 1,
-        },
-      }
-    );
-
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: "Resume not found",
-      });
-    }
-
-    return res.redirect(resume.fileUrl);
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch resume",
-    });
-  }
-});
-
-
-/* -------------------------------------------------------------------------- */
-/*                      GET RESUME BY USERNAME                                */
-/* -------------------------------------------------------------------------- */
-
-router.get("/:username/download", async (req, res) => {
-  try {
-    const { username } = req.params;
-
-    const resume = await prisma.resume.findFirst({
-      where: {
-        user: {
-          username: {
-            equals: username,
-            mode: 'insensitive',
-          },
-        },
-      },
-    });
-
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: "Resume not found",
-      });
-    }
-
-    return res.redirect(resume.fileUrl);
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch resume",
-    });
-  }
-});
-
-
 router.get(
   "/",
   protectRoute,
@@ -113,12 +46,88 @@ router.get(
 );
 
 
+router.get("/:username/download", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const resume = await prisma.resume.findFirst({
+      where: {
+        user: {
+          username: {
+            equals: username,
+            mode: 'insensitive',
+          },
+        },
+      },
+    });
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found",
+      });
+    }
+
+    return res.redirect(resume.fileUrl);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch resume",
+    });
+  }
+});
+
+router.get("/download", async (req, res) => {
+  try {
+    const resume = await prisma.resume.findFirst(
+      {
+        where:{
+          userId: 1,
+        },
+      }
+    );
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found",
+      });
+    }
+
+    return res.redirect(resume.fileUrl);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch resume",
+    });
+  }
+});
+
+
+/* -------------------------------------------------------------------------- */
+/*                      GET RESUME BY USERNAME                                */
+/* -------------------------------------------------------------------------- */
+
+
+
+
+
+
 router.post(
   "/upload",
   resumeUpload.single("resume"),
+  protectRoute,
   async (req, res) => {
     try {
-      const existing = await prisma.resume.findFirst();
+      const existing = await prisma.resume.findFirst({
+        where: {
+          userId: req.user.id,
+        },
+      });
       const { title } = req.body;
       if (existing) {
         await prisma.resume.update({
@@ -135,6 +144,7 @@ router.post(
           data: {
             title: title || "My Resume",
             fileUrl: req.file.path,
+            userId: req.user.id,
           },
         });
       }

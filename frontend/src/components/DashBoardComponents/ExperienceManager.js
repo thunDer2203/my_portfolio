@@ -63,7 +63,44 @@ export default function ExperienceManager() {
 
   const addExperience = () => setExperiences([...experiences, emptyExp()]);
   const removeExperience = (i) => setExperiences(experiences.filter((_, idx) => idx !== i));
-  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 3000); };
+ 
+  const BASE = process.env.NEXT_PUBLIC_API_URL;
+
+const handleSave = async () => {
+  try {
+    const res = await fetch(
+      `${BASE}/experience`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          experiences,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(
+        data.message ||
+          "Failed to save experiences"
+      );
+    }
+
+    setSaved(true);
+    setTimeout(
+      () => setSaved(false),
+      3000
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const inp = { width: "100%", background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 8, color: "#e0e0e0", fontSize: 13, padding: "10px 12px", outline: "none", fontFamily: "inherit" };
   const lbl = { fontSize: 11, fontWeight: 500, color: "#444", textTransform: "uppercase", letterSpacing: "0.06em" };

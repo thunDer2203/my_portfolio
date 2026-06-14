@@ -79,7 +79,12 @@ router.post("/register", async (req, res) => {
     } = req.body;
 
     /* ------------------------------ Validation ----------------------------- */
-
+    if(username.toLowerCase() === "secure"  || username.toLowerCase() === "secured"){
+      return res.status(400).json({
+        success: false,
+        message: "Username 'secure,secured' is reserved",
+      });
+    }
     if (!name || !email || !password || !username) {
       return res.status(400).json({
         success: false,
@@ -111,11 +116,15 @@ router.post("/register", async (req, res) => {
 
     /* -------------------------- Existing Username ------------------------- */
 
-    const existingUsername = await prisma.user.findUnique({
-      where: {
-        username,
+  const existingUsername =
+  await prisma.user.findFirst({
+    where: {
+      username: {
+        equals: username,
+        mode: "insensitive",
       },
-    });
+    },
+  });
 
     if (existingUsername) {
       return res.status(400).json({

@@ -78,7 +78,6 @@ const saveAll = async () => {
 
     setSaved(true);
 
-    fetchSkills();
 
     setTimeout(() => {
       setSaved(false);

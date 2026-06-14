@@ -35,6 +35,45 @@ useEffect(() => {
 }, []);
 
 
+const BASE = process.env.NEXT_PUBLIC_API_URL;
+
+const handleSave = async () => {
+  try {
+    const res = await fetch(
+      `${BASE}/about`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          heading: form.heading,
+          content: form.content,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(
+        data.message ||
+          "Failed to save about section"
+      );
+    }
+
+    setSaved(true);
+    setTimeout(
+      () => setSaved(false),
+      3000
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   const hasContent = form.heading.trim() || form.content.trim();
 
   return (
@@ -107,7 +146,7 @@ useEffect(() => {
       <div style={{ padding: "1.25rem 2rem 1.75rem", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid #1a1a1a" }}>
         <span style={{ fontSize: 13, color: "#3a9e5f", opacity: saved ? 1 : 0, transition: "opacity 0.3s" }}>✓ Saved successfully</span>
         <button
-          onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000); }}
+          onClick={handleSave}
           style={{ display: "flex", alignItems: "center", gap: 8, background: "#f0f0f0", color: "#111", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
         >
           Save about
