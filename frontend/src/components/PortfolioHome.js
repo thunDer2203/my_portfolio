@@ -748,7 +748,7 @@ export default function PortfolioHome({ onReturn, username }) {
           <span className="hero-bg-text">DEV</span>
 
           <div className="hero-content">
-            <p className="hero-eyebrow">{"// Full Stack Engineer"}</p>
+            {/* <p className="hero-eyebrow">{"// Full Stack Engineer"}</p> */}//Need to add hero header in about to make this work
             <h1
               className="hero-name"
               style={{ transform: `translate(${px * 0.3}px, ${py * 0.2}px)` }}
