@@ -65,6 +65,12 @@ export default function RegisterPage() {
       setError("Passwords do not match");
       return;
     }
+    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+
+if (!usernameRegex.test(form.username)) {
+  setError("Username can only contain letters, numbers, underscores and hyphens");
+  return;
+}
 
     try {
       setLoading(true);
@@ -131,7 +137,7 @@ export default function RegisterPage() {
 
           <input
             name="username"
-            placeholder="Username"
+            placeholder="Username (e.g. johndoe)"
             value={form.username}
             onChange={handleChange}
             required

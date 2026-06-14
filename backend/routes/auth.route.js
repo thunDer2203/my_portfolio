@@ -79,18 +79,29 @@ router.post("/register", async (req, res) => {
     } = req.body;
 
     /* ------------------------------ Validation ----------------------------- */
-    if(username.toLowerCase() === "secure"  || username.toLowerCase() === "secured"){
-      return res.status(400).json({
-        success: false,
-        message: "Username 'secure,secured' is reserved",
-      });
-    }
     if (!name || !email || !password || !username) {
       return res.status(400).json({
         success: false,
         message: "Name, username, email and password are required",
       });
     }
+    
+    if(username.toLowerCase() === "secure"  || username.toLowerCase() === "secured"){
+      return res.status(400).json({
+        success: false,
+        message: "Username 'secure,secured' is reserved",
+      });
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+
+if (!usernameRegex.test(username)) {
+  return res.status(400).json({
+    success: false,
+    message:
+      "Username can only contain letters, numbers, underscores and hyphens",
+  });
+}
 
     if (password.length < 6) {
       return res.status(400).json({

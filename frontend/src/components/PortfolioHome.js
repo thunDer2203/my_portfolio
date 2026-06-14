@@ -354,6 +354,7 @@ export default function PortfolioHome({ onReturn, username }) {
           font-weight: 800;
           line-height: .95;
           letter-spacing: -.03em;
+          margin-top:3rem;
           margin-bottom: 1.5rem;
           animation: fadeUp .8s .35s both;
         }
