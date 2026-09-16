@@ -1,0 +1,24 @@
+{
+  "name": "portfolio-mcp-server2",
+  "version": "1.0.0",
+  "description": "MCP server exposing Shubham's portfolio data (projects, skills, experience) as tools for LLM clients",
+  "type": "module",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc --watch",
+    "ollama": "node build/ollama-client.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^17.4.2",
+    "ollama": "^0.6.3",
+    "process": "^0.11.10",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
