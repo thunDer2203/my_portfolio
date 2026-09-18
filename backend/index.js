@@ -26,6 +26,7 @@ app.use(express.json());
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.FRONTEND_URL_2,
+  process.env.AI_SERVER_URL,
 ].filter(Boolean);
 
 app.use(
